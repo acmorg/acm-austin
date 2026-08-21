@@ -1,1046 +1,152 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ACM Austin — Planner</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;450;500;600&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
-<style>
-:root{
-  /* PANTONE 17-1230 Mocha Mousse — three colors, no more: warm cream, deep
-     espresso ink, and one mocha-terracotta accent (used at three tints
-     instead of reaching for extra hues) */
-  --paper:#F6F1E7;
-  --paper-2:#ECE2CE;
-  --card:#FFFFFF;
-  --line:#E2D6BE;
-  --line-strong:#CBB795;
-
-  --ink:#2E1B12;
-  --muted:#6F5A47;
-  --dim:#A2917A;
-
-  --accent:#8B4A2E;
-  --accent-deep:#6B3A22;
-  --accent-wash:#F1E1D2;
-
-  /* elevation — the depth cue is a lifted shadow, not a color wash */
-  --shadow:0 1px 2px rgba(46,27,18,.05),0 10px 24px -12px rgba(46,27,18,.18);
-  --shadow-lg:0 2px 4px rgba(46,27,18,.05),0 22px 44px -18px rgba(46,27,18,.24);
-
-  /* the whole page sits as one lifted sheet, inset from the browser edge */
-  --outer:22px;
-  --outer-r:28px;
-  --nav-inset:14px;
-
-  --maxw:1180px;
-  --r:16px;
-}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;overflow-x:clip}
-body{
-  margin:0;background:var(--paper-2);color:var(--ink);
-  font-family:'Inter',system-ui,sans-serif;font-weight:450;
-  -webkit-font-smoothing:antialiased;overflow-x:clip;
-}
-a{color:inherit}
-h1,h2,h3{font-family:'Sora',system-ui,sans-serif;font-weight:700;letter-spacing:-.035em;margin:0}
-.mono{font-family:'IBM Plex Mono',monospace}
-.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px;position:relative;z-index:2}
-img,svg{display:block}
-
-/* ============ the outer box ============ */
-.page{
-  margin:var(--outer);background:var(--paper);color:var(--ink);
-  border:1px solid var(--line-strong);border-radius:var(--outer-r);
-  box-shadow:var(--shadow-lg);position:relative;
-}
-
-/* ============ nav ============ */
-/* a self-contained floating pill, not a flush bar — so it still looks like
-   something (rounded, bordered, its own shadow) once it detaches from the
-   page's top edge on scroll, instead of an oddly half-rounded strip.
-   top:0, not top:var(--outer) — sticky's `top` is an absolute floor in
-   viewport coordinates, not "however far the box's margin happens to be".
-   Any value greater than 0 leaves a strip of true viewport above the nav
-   that belongs to no element's paint area once the page has scrolled, so
-   whatever normal-flow content is passing through it at that instant shows
-   through. top:0 means nav starts nested at rest (its natural position,
-   flush with the page's own border, sits well below 0) and only locks once
-   scrolling would push it past the true edge — from then on nothing can
-   ever render above it, because y:0 is the actual boundary of the viewport. */
-.nav{
-  position:sticky;top:0;z-index:70;
-  margin:0 var(--nav-inset,14px);
-  background:rgba(246,241,231,.92);backdrop-filter:blur(14px);
-  border:1px solid var(--line-strong);border-radius:20px;box-shadow:var(--shadow);
-}
-.nav-in{max-width:var(--maxw);margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:20px}
-.brand{display:flex;align-items:center;gap:11px;text-decoration:none}
-.logo{
-  width:30px;height:30px;border-radius:9px;display:grid;place-items:center;flex:none;
-  background:var(--accent);color:#fff;
-  font:600 11px 'IBM Plex Mono',monospace;letter-spacing:-.02em;
-}
-.brand b{font-family:'Sora';font-weight:700;font-size:15.5px;letter-spacing:-.02em}
-.brand span{font-family:'IBM Plex Mono';font-size:12px;color:var(--dim)}
-.nav-links{margin-left:auto;display:flex;gap:22px;align-items:center}
-.nav-links a{font-size:14px;color:var(--muted);text-decoration:none;transition:color .15s}
-.nav-links a:hover{color:var(--accent)}
-.nav-social{display:flex;gap:8px;align-items:center}
-
-.hamburger{
-  display:none;width:38px;height:38px;border-radius:10px;flex:none;margin-left:auto;
-  border:1px solid var(--line-strong);background:var(--card);cursor:pointer;
-  flex-direction:column;align-items:center;justify-content:center;gap:4px;
-}
-.hamburger span{width:18px;height:2px;background:var(--ink);border-radius:2px;transition:transform .2s ease,opacity .2s ease}
-.hamburger[aria-expanded="true"] span:nth-child(1){transform:translateY(6px) rotate(45deg)}
-.hamburger[aria-expanded="true"] span:nth-child(2){opacity:0}
-.hamburger[aria-expanded="true"] span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
-
-.mobile-menu{
-  display:none;position:absolute;left:12px;right:12px;top:calc(100% + 8px);
-  background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px;
-  box-shadow:0 26px 54px -22px rgba(46,27,18,.24);z-index:71;flex-direction:column;gap:2px;
-}
-.mobile-menu[hidden]{display:none}
-.mobile-menu a{display:block;padding:13px 14px;border-radius:10px;text-decoration:none;color:var(--ink);font-size:15px;font-weight:500}
-.mobile-menu a:hover{background:var(--paper-2)}
-.mobile-menu-cta{display:flex;gap:8px;flex-wrap:wrap;padding:10px 6px 4px;border-top:1px solid var(--line);margin-top:6px}
-
-.icon-btn{
-  width:32px;height:32px;border-radius:99px;border:1px solid var(--line-strong);display:grid;place-items:center;
-  color:var(--muted);text-decoration:none;flex:none;transition:all .15s ease;background:var(--card);
-}
-.icon-btn:hover{border-color:#0A66C2;color:#0A66C2;background:#EAF3FC}
-.icon-btn svg{width:15px;height:15px}
-
-.btn{
-  display:inline-flex;align-items:center;justify-content:center;gap:9px;text-decoration:none;
-  font-family:'IBM Plex Mono',monospace;font-weight:500;font-size:13px;letter-spacing:.01em;
-  padding:12px 20px;border-radius:99px;border:1px solid var(--ink);
-  background:var(--ink);color:var(--paper);white-space:nowrap;cursor:pointer;
-  transition:filter .16s ease,transform .16s ease,box-shadow .16s ease;
-}
-.btn:hover{filter:brightness(1.15);transform:translateY(-1px);box-shadow:0 10px 26px -14px rgba(46,27,18,.45)}
-.btn.amber{background:var(--accent);border-color:var(--accent);color:#fff}
-.btn.amber:hover{box-shadow:0 12px 28px -12px var(--accent)}
-.btn.accent{background:var(--accent);border-color:var(--accent);color:var(--ink)}
-.btn.accent:hover{box-shadow:0 12px 28px -12px var(--accent)}
-.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line-strong)}
-.btn.ghost:hover{border-color:var(--accent);color:var(--accent);box-shadow:none;filter:none}
-.btn.sm{padding:9px 16px;font-size:12px}
-.btn[disabled]{opacity:.35;pointer-events:none}
-
-/* ============ hero ============ */
-.hero{padding:66px 0 52px;text-align:center}
-.proof{
-  display:inline-flex;align-items:center;gap:12px;padding:6px 16px 6px 6px;
-  border:1px solid var(--line-strong);border-radius:99px;background:var(--card);box-shadow:var(--shadow);
-}
-.faces{display:flex}
-.faces i{
-  width:26px;height:26px;border-radius:99px;border:2px solid var(--card);margin-left:-9px;
-  display:grid;place-items:center;font:600 9px 'IBM Plex Mono',monospace;color:var(--ink);font-style:normal;
-}
-.faces i:first-child{margin-left:0}
-.faces i:nth-child(1){background:#D9A67E}
-.faces i:nth-child(2){background:var(--paper-2)}
-.faces i:nth-child(3){background:#C79570}
-.faces i:nth-child(4){background:var(--line)}
-.proof .stars{color:var(--accent-deep);font-size:12px;letter-spacing:.1em}
-.proof .txt{font-family:'IBM Plex Mono';font-size:12px;color:var(--muted)}
-.proof .txt b{color:var(--ink);font-weight:600}
-
-h1{font-size:clamp(36px,6.2vw,72px);line-height:1.05;margin:26px auto 0;max-width:16ch}
-h1 em{font-style:normal;color:var(--accent-deep)}
-.lede{color:var(--muted);font-size:17.5px;line-height:1.68;max-width:56ch;margin:22px auto 0}
-
-.clock{margin:36px auto 0;display:inline-flex;flex-direction:column;align-items:center;gap:12px}
-.clock-label{font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
-.clock-label b{color:var(--accent);font-weight:600}
-.flaps{display:flex;align-items:flex-start;gap:10px}
-.unit{display:flex;flex-direction:column;align-items:center;gap:9px}
-.digits{display:flex;gap:5px}
-.flap{
-  position:relative;width:52px;height:66px;border-radius:10px;overflow:hidden;
-  background:var(--card);border:1px solid var(--line-strong);
-  font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:33px;color:var(--accent);
-  display:grid;place-items:center;box-shadow:0 10px 22px -18px rgba(46,27,18,.35);
-}
-.flap::after{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(46,27,18,.12)}
-.flap.turn{animation:turn .42s ease}
-@keyframes turn{0%{transform:rotateX(0);filter:brightness(1)}45%{transform:rotateX(-42deg);filter:brightness(.82)}100%{transform:rotateX(0);filter:brightness(1)}}
-.unit small{font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
-.colon{font-family:'IBM Plex Mono';font-size:26px;color:var(--line-strong);padding-top:18px}
-
-.hero-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:34px}
-.checks{display:flex;gap:26px;justify-content:center;flex-wrap:wrap;margin-top:26px}
-.check{display:flex;align-items:center;gap:9px;font-size:14px;color:var(--muted)}
-.check i{
-  width:18px;height:18px;border-radius:99px;background:var(--accent);color:#fff;flex:none;
-  display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:700;
-}
-
-/* ============ shared section chrome ============ */
-section{padding:80px 0}
-.eyebrow{font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-deep);margin-bottom:12px;display:block}
-h2{font-size:clamp(27px,3.7vw,40px)}
-.sec-lede{color:var(--muted);font-size:16.5px;line-height:1.68;max-width:56ch;margin:12px 0 0}
-.sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:8px}
-
-/* ============ planner (signature) ============ */
-.planner{display:grid;grid-template-columns:1fr 328px;gap:20px;align-items:start;margin-top:36px}
-
-.planner-left{
-  position:relative;
-  display:grid;gap:16px;
-  max-height:460px;overflow-y:auto;scroll-snap-type:y mandatory;
-  /* without scroll-padding, the snap engine treats padding as dead space and
-     auto-scrolls past it on load to snap the first card flush — this was
-     silently eating the top padding and clipping the first card into view */
-  scroll-padding-top:18px;
-  border:1px solid var(--line);border-radius:var(--r);background:var(--card);box-shadow:var(--shadow);
-  padding:18px;scrollbar-width:thin;scrollbar-color:var(--line-strong) transparent;
-}
-.planner-left::-webkit-scrollbar{width:8px}
-.planner-left::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:99px}
-
-.ecard{
-  position:relative;
-  scroll-snap-align:start;display:grid;grid-template-columns:112px 1fr;gap:24px;
-  border:1px solid var(--line);border-radius:14px;padding:24px;background:var(--paper);
-  transition:border-color .2s ease,background .2s ease;
-}
-.ecard.active{border-color:var(--accent);background:var(--accent-wash)}
-/* the one session that's actually next — a permanent marker, independent of
-   whichever card happens to be scrolled into view right now */
-.ecard.next-up{border:2px dashed var(--accent);padding-top:32px}
-.ecard.next-up::before{
-  content:"★ Next session";position:absolute;top:0;left:20px;transform:translateY(-50%);
-  background:var(--accent);color:#fff;font-family:'IBM Plex Mono';font-size:10px;font-weight:600;
-  letter-spacing:.1em;text-transform:uppercase;padding:5px 12px;border-radius:99px;box-shadow:var(--shadow);
-}
-.ecard-date{border-right:1px solid var(--line);padding-right:22px;font-family:'IBM Plex Mono'}
-.ecard.active .ecard-date{border-color:rgba(107,70,50,.25)}
-.ecard-date .n{font-size:38px;color:var(--accent);line-height:1;font-weight:600;letter-spacing:-.02em}
-.ecard-date .m{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin-top:8px}
-.ecard-kind{font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
-.ecard[data-kind="workshop"] .ecard-kind{color:var(--muted)}
-.ecard h3{font-size:20px;font-weight:600;line-height:1.28;margin-bottom:9px;letter-spacing:-.02em}
-.ecard p{margin:0 0 14px;color:var(--muted);font-size:14.5px;line-height:1.62;max-width:56ch}
-.ecard-tags{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px}
-.etag{font-family:'IBM Plex Mono';font-size:11px;color:var(--muted);background:var(--card);border:1px solid var(--line);border-radius:99px;padding:5px 11px}
-.ecard.active .etag{background:#fff}
-.ecard-foot{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
-.who{display:flex;align-items:center;gap:8px;font-family:'IBM Plex Mono';font-size:12px;color:var(--dim)}
-.who i{width:20px;height:20px;border-radius:99px;background:var(--paper-2);border:1px solid var(--line);display:grid;place-items:center;font-style:normal;font-size:8.5px;color:var(--muted);flex:none}
-.going{font-family:'IBM Plex Mono';font-size:12px;color:var(--dim)}
-
-/* past sessions live in the same list, not a separate box — muted date and
-   kind label plus a "recap" tag instead of RSVP is what tells them apart */
-.ecard[data-status="past"] .ecard-date .n{color:var(--muted)}
-.ecard[data-status="past"] .ecard-kind{color:var(--dim)}
-.recap-tag{
-  font-family:'IBM Plex Mono';font-size:11px;color:var(--dim);
-  border:1px solid var(--line);border-radius:99px;padding:5px 11px;white-space:nowrap;
-}
-
-/* sticky calendar */
-.planner-cal{position:sticky;top:88px;border:1px solid var(--line);border-radius:var(--r);background:var(--card);box-shadow:var(--shadow);padding:22px}
-.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-.cal-title{font-family:'Sora';font-weight:600;font-size:16px;letter-spacing:-.02em}
-.cal-nav{
-  width:30px;height:30px;border-radius:9px;border:1px solid var(--line-strong);background:var(--paper);
-  display:grid;place-items:center;cursor:pointer;font-size:15px;color:var(--ink);transition:all .15s ease;
-}
-.cal-nav:hover{border-color:var(--accent);color:var(--accent)}
-.cal-nav[disabled]{opacity:.3;pointer-events:none}
-.cal-dow{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:6px}
-.cal-dow span{font-family:'IBM Plex Mono';font-size:10px;color:var(--dim);text-align:center;padding:4px 0}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
-.cal-day{
-  aspect-ratio:1;display:grid;place-items:center;border-radius:8px;font-size:12.5px;color:var(--ink);
-  position:relative;font-family:'IBM Plex Mono';
-}
-.cal-day.muted{color:var(--dim);opacity:.45}
-.cal-day.has-event{background:var(--accent);color:#fff;font-weight:600;cursor:pointer}
-.cal-day.has-event:hover{background:var(--accent);color:var(--ink)}
-.cal-day.has-event::after{content:"";position:absolute;bottom:3px;left:50%;width:4px;height:4px;margin-left:-2px;border-radius:99px;background:#fff}
-.cal-day.has-event.is-next{animation:pulseRing 2.4s ease-in-out infinite}
-@keyframes pulseRing{0%,100%{box-shadow:0 0 0 3px var(--accent-wash)}50%{box-shadow:0 0 0 6px var(--accent-wash)}}
-.cal-legend{display:flex;align-items:center;gap:8px;margin-top:16px;padding-top:16px;border-top:1px solid var(--line);font-family:'IBM Plex Mono';font-size:11px;color:var(--dim)}
-.cal-legend i{width:8px;height:8px;border-radius:99px;background:var(--accent);display:inline-block}
-
-.cal-list{
-  margin-top:16px;display:flex;flex-direction:column;gap:6px;
-  max-height:260px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--line-strong) transparent;
-}
-.cal-list::-webkit-scrollbar{width:6px}
-.cal-list::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:99px}
-.cal-item{
-  display:flex;align-items:center;gap:10px;padding:10px 11px;border-radius:10px;
-  border:1px solid transparent;cursor:pointer;transition:all .15s ease;text-align:left;background:none;width:100%;
-  font-family:'Inter';color:var(--muted);
-}
-.cal-item:hover{background:var(--paper-2)}
-.cal-item.active{border-color:var(--line-strong);background:var(--accent-wash);color:var(--ink)}
-.cal-item.is-next{border-color:var(--accent)}
-.cal-item.is-past:not(.active){opacity:.7}
-.cal-item b{font-family:'IBM Plex Mono';font-size:11px;color:var(--dim);min-width:52px}
-.cal-item.active b{color:var(--accent)}
-.cal-item span{font-size:13px;line-height:1.35}
-.next-tag{
-  display:inline-block;font-style:normal;font-family:'IBM Plex Mono';font-size:9px;font-weight:700;
-  letter-spacing:.08em;text-transform:uppercase;background:var(--accent);color:#fff;
-  padding:2px 6px;border-radius:99px;margin-right:5px;vertical-align:middle;
-}
-
-.planner-controls{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 16px;margin-top:16px}
-.dots{display:flex;gap:7px}
-.pdot{width:7px;height:7px;border-radius:99px;background:var(--line-strong);transition:all .2s ease}
-.pdot.active{background:var(--accent);width:20px;border-radius:99px}
-
-/* speaker CTA banner */
-.speak-banner{
-  margin-top:20px;border:1px dashed var(--line-strong);border-radius:14px;padding:20px 24px;
-  display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
-  background:var(--card);box-shadow:var(--shadow);
-}
-.speak-banner p{margin:0;font-size:14.5px;color:var(--muted);max-width:48ch}
-.speak-banner p b{color:var(--ink);font-weight:600}
-
-/* ============ run of show ============ */
-.runsheet{border:1px solid var(--line);border-radius:var(--r);background:var(--card);box-shadow:var(--shadow);overflow:hidden;margin-top:40px}
-.runsheet-top{padding:20px 26px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;background:var(--paper-2)}
-.runsheet-top h3{font-size:17px;font-weight:600}
-.runsheet-top span{font-family:'IBM Plex Mono';font-size:12px;color:var(--dim)}
-
-.slot{display:grid;grid-template-columns:88px 1fr;gap:22px;padding:18px 26px;border-bottom:1px solid var(--line);align-items:baseline}
-.slot:last-child{border-bottom:0}
-.slot time{font-family:'IBM Plex Mono';font-size:13px;color:var(--accent)}
-.slot b{font-weight:600;font-size:15.5px;display:block;margin-bottom:3px}
-.slot span{color:var(--dim);font-size:14px;line-height:1.5}
-
-/* ============ format cards ============ */
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:38px}
-.card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:28px;box-shadow:var(--shadow);transition:transform .2s ease,box-shadow .2s ease}
-.card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
-.badge{position:absolute;right:14px;top:14px;font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);border:1px solid var(--line);border-radius:99px;padding:5px 10px}
-.card .ico{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:17px;margin-bottom:18px;background:var(--accent-wash);color:var(--accent-deep)}
-.card h3{font-size:17.5px;font-weight:600;margin-bottom:8px}
-.card p{margin:0;color:var(--muted);font-size:14.5px;line-height:1.62}
-
-/* ============ host ============ */
-.host{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:34px;box-shadow:var(--shadow);display:grid;grid-template-columns:auto 1fr auto;gap:28px;align-items:center}
-.avatar{
-  width:96px;height:96px;border-radius:24px;flex:none;
-  background:var(--accent);color:#fff;
-  display:grid;place-items:center;font-family:'Sora';font-weight:700;font-size:31px;letter-spacing:-.03em;
-  box-shadow:0 16px 34px -20px rgba(107,70,50,.5);
-}
-.host h3{font-size:23px;margin:5px 0 2px}
-.host p{margin:10px 0 0;color:var(--muted);font-size:15.5px;line-height:1.68;max-width:56ch}
-.host-cta{display:flex;flex-direction:column;flex-wrap:wrap;gap:10px}
-
-/* ============ venue ============ */
-.venue{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:38px}
-.vcard{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
-.vtxt{padding:32px}
-.vtxt h3{font-size:20px;font-weight:600;margin-bottom:16px}
-.addr{font-family:'IBM Plex Mono';font-size:13.5px;line-height:1.95;color:var(--muted)}
-.addr b{color:var(--ink);font-weight:600}
-.map{min-height:280px;position:relative;overflow:hidden;
-  background:
-    repeating-linear-gradient(0deg,rgba(74,44,25,.07) 0 1px,transparent 1px 30px),
-    repeating-linear-gradient(90deg,rgba(74,44,25,.07) 0 1px,transparent 1px 30px),
-    var(--paper-2);}
-.map::after{content:"";position:absolute;left:50%;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:99px;background:var(--accent);box-shadow:0 0 0 9px var(--accent-wash)}
-.map span{position:absolute;left:50%;top:calc(50% + 28px);transform:translateX(-50%);white-space:nowrap;font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
-
-/* ============ join ============ */
-.join{
-  text-align:center;border:1px solid var(--line);border-radius:26px;padding:64px 40px;
-  background:var(--card);box-shadow:var(--shadow-lg);
-  position:relative;
-}
-.join h2{max-width:19ch;margin:0 auto 14px}
-.join .sec-lede{margin:0 auto 30px}
-.join-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-
-footer{border-top:1px solid var(--line);padding:30px 0;font-family:'IBM Plex Mono';font-size:12px;color:var(--dim)}
-.foot-in{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;align-items:center}
-.foot-links{display:flex;gap:16px;align-items:center}
-.foot-links a{text-decoration:none}
-.foot-links a:hover{color:var(--accent)}
-
-.dock{
-  position:fixed;left:12px;right:12px;bottom:12px;z-index:80;display:none;
-  background:rgba(255,255,255,.92);backdrop-filter:blur(14px);
-  border:1px solid var(--line-strong);border-radius:16px;padding:12px 14px;
-  align-items:center;gap:12px;box-shadow:0 20px 44px -20px rgba(28,24,16,.35);
-}
-.dock div{flex:1;min-width:0}
-.dock b{display:block;font-size:14px;font-weight:600;font-family:'Sora'}
-.dock small{font-family:'IBM Plex Mono';font-size:11px;color:var(--dim)}
-
-.rv{opacity:0;transform:translateY(18px);transition:opacity .65s ease,transform .65s ease}
-.rv.in{opacity:1;transform:none}
-:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
-
-@media (max-width:1000px){
-  .planner{grid-template-columns:1fr}
-  .planner-cal{position:static}
-  .grid3{grid-template-columns:1fr}
-  .venue{grid-template-columns:1fr}
-  .host{grid-template-columns:1fr;text-align:left}
-  .host-cta{flex-direction:row}
-}
-@media (max-width:430px){
-  .flaps{gap:6px}
-  .flap{width:36px;height:50px;font-size:23px;border-radius:8px}
-  .colon{font-size:20px;padding-top:14px}
-  .unit small{font-size:9px}
-  .checks{gap:16px 22px}
-  .ecard{grid-template-columns:1fr;gap:14px}
-  .ecard-date{border-right:0;border-bottom:1px solid var(--line);padding-right:0;padding-bottom:12px;display:flex;align-items:baseline;gap:10px}
-  .ecard-date .n{font-size:26px}
-}
-/* the clock above still overflowed at true small-phone widths (320–359px) —
-   its total width (4 two-digit units + 3 colons + gaps) doesn't fit inside
-   the 430px sizing, and overflow-x:clip hides that instead of shrinking it,
-   so it was silently getting cut off screen rather than resizing */
-@media (max-width:359px){
-  .wrap{padding:0 16px}
-  .flaps{gap:3px}
-  .digits{gap:3px}
-  .flap{width:22px;height:34px;font-size:15px;border-radius:6px}
-  .colon{font-size:12px;padding-top:9px}
-  .unit small{font-size:7.5px;letter-spacing:.1em}
-}
-@media (max-width:960px){
-  :root{--outer:10px;--outer-r:16px;--nav-inset:8px}
-  .nav-links{display:none}
-  .hamburger{display:flex}
-  .mobile-menu:not([hidden]){display:flex}
-  .dock{display:flex}
-  body{padding-bottom:86px}
-  .join{padding:52px 22px}
-  section{padding:60px 0}
-  .slot{grid-template-columns:1fr;gap:6px}
-}
-@media (prefers-reduced-motion:reduce){
-  *{animation:none!important;transition:none!important}
-  .rv{opacity:1;transform:none}
-}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="ACM Austin: monthly talks, workshops, and community for engineers who ship.">
+  <title>ACM Austin | Engineering the Future</title>
+  <link rel="icon" type="image/png" href="photos/logos/acm.png">
+  <link rel="apple-touch-icon" href="photos/logos/acm.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        colors: { navy: '#071525', ink: '#10253d', electric: '#2dd4ff', lime: '#c8f169', mist: '#edf4f7' },
+        fontFamily: { sans: ['Plus Jakarta Sans', 'ui-sans-serif', 'sans-serif'], mono: ['IBM Plex Mono', 'monospace'] },
+        boxShadow: { glow: '0 0 45px rgba(45,212,255,.18)' }
+      }}
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>#volunteer-form{display:none}#volunteer{display:none}#volunteer-form-google iframe{display:none}</style>
 </head>
-<body>
+<body class="bg-mist text-ink font-sans antialiased">
+  <header class="bg-navy text-white">
+    <nav class="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 lg:px-8" aria-label="Main navigation">
+      <a href="#top" class="flex items-center gap-3 font-bold tracking-tight"><img class="h-10 w-10 rounded-lg bg-white object-contain p-1" src="photos/logos/acm.png" alt="ACM Austin logo"><span>ACM <span class="text-electric">Austin</span></span></a>
+      <div class="hidden items-center gap-8 text-sm text-slate-300 md:flex"><a href="#events" class="hover:text-white">Events</a><a href="sessionize.html" class="hover:text-white">Speakers</a><a href="#community" class="hover:text-white">Community</a><a href="https://docs.google.com/forms/d/1f_ucupsckbus_6K4Qd5OI2gOVTxNdLt0rQpzXUctnxI/viewform" target="_blank" rel="noopener" class="hover:text-white">Volunteer ↗</a><a href="https://docs.google.com/forms/d/e/1FAIpQLSc8HPaboM9NUODwUT-upXe4gyXFqnrG_s37TalQi6HpJ4n2_A/viewform?usp=dialog" target="_blank" rel="noopener" class="hover:text-white">Sponsor ↗</a><a href="#venue" class="hover:text-white">Venue</a></div>
+      <a href="https://www.meetup.com/acm-austin/" target="_blank" rel="noopener" class="rounded-full bg-lime px-5 py-2.5 text-sm font-bold text-navy transition hover:bg-white">Join the chapter</a>
+    </nav>
+  </header>
 
-<div class="page">
-
-<nav class="nav">
-  <div class="nav-in">
-    <a class="brand" href="#top">
-      <span class="logo">AC</span>
-      <b>ACM Austin</b><span>/ IEEE</span>
-    </a>
-    <div class="nav-links">
-      <a href="#schedule">Schedule</a>
-      <a href="#about">Formats</a>
-      <a href="#venue">Venue</a>
-      <span class="nav-social">
-        <a class="icon-btn" href="https://www.linkedin.com/company/acm-austin/?utm_source=luma" target="_blank" rel="noopener" aria-label="ACM Austin on LinkedIn">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/></svg>
-        </a>
-      </span>
-      <a class="btn amber sm" href="https://www.meetup.com/acm-austin/" target="_blank" rel="noopener">Join on Meetup</a>
-    </div>
-    <button class="hamburger" id="menuBtn" type="button" aria-expanded="false" aria-controls="mobileMenu" aria-label="Open menu">
-      <span></span><span></span><span></span>
-    </button>
-    <div class="mobile-menu" id="mobileMenu" hidden>
-      <a href="#schedule">Schedule</a>
-      <a href="#about">Formats</a>
-      <a href="#venue">Venue</a>
-      <div class="mobile-menu-cta">
-        <a class="btn amber sm" href="https://www.meetup.com/acm-austin/" target="_blank" rel="noopener">Join on Meetup</a>
-        <a class="btn ghost sm" href="https://sessionize.com/austin-acm-meetup/" target="_blank" rel="noopener">Propose a talk</a>
-        <a class="icon-btn" href="https://www.linkedin.com/company/acm-austin/?utm_source=luma" target="_blank" rel="noopener" aria-label="ACM Austin on LinkedIn">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/></svg>
-        </a>
+  <main id="top">
+    <section class="relative overflow-hidden bg-navy pb-20 pt-16 text-white lg:pb-28 lg:pt-24">
+      <div class="absolute inset-0 opacity-30" aria-hidden="true" style="background-image:linear-gradient(rgba(45,212,255,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(45,212,255,.12) 1px,transparent 1px);background-size:48px 48px"></div>
+      <div class="relative mx-auto grid max-w-7xl gap-12 px-6 lg:grid-cols-[1.2fr_.8fr] lg:items-end lg:px-8">
+        <div><p class="mb-6 font-mono text-xs uppercase tracking-[.25em] text-electric">Austin, Texas / ACM + IEEE</p><h1 class="max-w-4xl text-5xl font-extrabold leading-[1.03] tracking-tight sm:text-7xl">Build what’s <span class="text-electric">next.</span><br>Share what works.</h1><p class="mt-7 max-w-2xl text-lg leading-8 text-slate-300">A monthly gathering for engineers working across AI, data, cloud, and security. No vendor theatre. Just useful ideas, honest trade-offs, and people who ship.</p><div class="mt-9 flex flex-wrap gap-3"><a href="#events" class="rounded-full bg-electric px-6 py-3 text-sm font-bold text-navy transition hover:bg-white">See upcoming events</a><a href="https://sessionize.com/austin-acm-meetup/" target="_blank" rel="noopener" class="rounded-full border border-slate-500 px-6 py-3 text-sm font-bold transition hover:border-electric hover:text-electric">Submit a talk ↗</a></div></div>
+        <div class="rounded-2xl border border-slate-700 bg-white/[.06] p-6 shadow-glow backdrop-blur"><p class="font-mono text-xs uppercase tracking-[.2em] text-lime">Next session</p><p id="next-event-name" class="mt-4 text-2xl font-bold">August Tech Talks &amp; Community Showcase</p><p id="next-event-date" class="mt-2 text-sm text-slate-300">Wednesday, August 26 · 6:00 PM</p><div class="mt-7 grid grid-cols-4 gap-2 text-center"><div class="rounded-lg bg-navy/70 p-3"><strong id="days" class="block text-2xl text-electric">00</strong><span class="font-mono text-[10px] uppercase text-slate-400">Days</span></div><div class="rounded-lg bg-navy/70 p-3"><strong id="hours" class="block text-2xl text-electric">00</strong><span class="font-mono text-[10px] uppercase text-slate-400">Hours</span></div><div class="rounded-lg bg-navy/70 p-3"><strong id="minutes" class="block text-2xl text-electric">00</strong><span class="font-mono text-[10px] uppercase text-slate-400">Min</span></div><div class="rounded-lg bg-navy/70 p-3"><strong id="seconds" class="block text-2xl text-electric">00</strong><span class="font-mono text-[10px] uppercase text-slate-400">Sec</span></div></div></div>
       </div>
-    </div>
-  </div>
-</nav>
+    </section>
 
-<header class="hero" id="top">
-  <div class="wrap">
-    <span class="proof">
-      <span class="faces"><i>PJ</i><i>AM</i><i>DR</i><i>+</i></span>
-      <span class="stars">★★★★★</span>
-      <span class="txt"><b>1,689</b> members · 4.8 from 134 ratings</span>
-    </span>
+    <section class="border-b border-slate-200 bg-white"><div class="mx-auto grid max-w-7xl gap-6 px-6 py-8 sm:grid-cols-3 lg:px-8"><div><strong class="block text-3xl font-extrabold text-navy">1,689+</strong><span class="text-sm text-slate-500">Austin members</span></div><div><strong class="block text-3xl font-extrabold text-navy">12</strong><span class="text-sm text-slate-500">events each year</span></div><div><strong class="block text-3xl font-extrabold text-navy">4.8/5</strong><span class="text-sm text-slate-500">community rating</span></div></div></section>
 
-    <h1>Enterprise AI and engineering, <em>one night a month.</em></h1>
-    <p class="lede">The Austin chapters of ACM and IEEE run technical talks and hands-on workshops for engineers who ship. Applied ML, generative AI, cloud-native platforms, DevSecOps, open data.</p>
+    <section id="events" class="mx-auto max-w-7xl px-6 py-20 lg:px-8"><div class="flex flex-wrap items-end justify-between gap-6"><div><p class="font-mono text-xs uppercase tracking-[.2em] text-cyan-600">The calendar</p><h2 class="mt-3 text-4xl font-extrabold tracking-tight text-navy">Upcoming events</h2><p class="mt-3 max-w-xl text-slate-600">Technical talks, practical workshops, and a community showcase. Free to attend, food included.</p></div><a href="https://www.meetup.com/acm-austin/events/" target="_blank" rel="noopener" class="rounded-full border border-ink px-5 py-2.5 text-sm font-bold hover:border-cyan-600 hover:text-cyan-700">All events ↗</a></div><div id="event-grid" class="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3" aria-live="polite"></div></section>
 
-    <div class="clock">
-      <span class="clock-label">Doors open in — <b id="next-label">Wed, Aug 26 · 6:00 PM</b></span>
-      <div class="flaps" id="clock" role="timer" aria-live="off">
-        <div class="unit"><div class="digits"><span class="flap">0</span><span class="flap">0</span></div><small>Days</small></div>
-        <span class="colon">:</span>
-        <div class="unit"><div class="digits"><span class="flap">0</span><span class="flap">0</span></div><small>Hrs</small></div>
-        <span class="colon">:</span>
-        <div class="unit"><div class="digits"><span class="flap">0</span><span class="flap">0</span></div><small>Min</small></div>
-        <span class="colon">:</span>
-        <div class="unit"><div class="digits"><span class="flap">0</span><span class="flap">0</span></div><small>Sec</small></div>
-      </div>
-    </div>
+    <section class="bg-navy px-6 py-16 text-white lg:px-8"><div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-8"><div><p class="font-mono text-xs uppercase tracking-[.2em] text-lime">Call for speakers</p><h2 class="mt-3 max-w-2xl text-3xl font-extrabold tracking-tight sm:text-4xl">Have a system worth dissecting?</h2><p class="mt-3 max-w-xl text-slate-300">Share the architecture, the decisions, and the lessons learned with Austin’s engineering community.</p></div><a href="https://sessionize.com/austin-acm-meetup/" target="_blank" rel="noopener" class="rounded-full bg-lime px-6 py-3 text-sm font-bold text-navy hover:bg-white">Propose a session ↗</a></div></section>
 
-    <div class="hero-cta">
-      <a class="btn amber" href="https://www.meetup.com/acm-austin/events/" target="_blank" rel="noopener">RSVP for the next session</a>
-      <a class="btn ghost" href="#schedule">Browse the season</a>
-    </div>
+    <section id="community" class="mx-auto max-w-7xl px-6 py-20 lg:px-8"><div class="grid gap-16 lg:grid-cols-[.8fr_1.2fr]"><div><p class="font-mono text-xs uppercase tracking-[.2em] text-cyan-600">People behind the work</p><h2 class="mt-3 text-4xl font-extrabold tracking-tight text-navy">The community is the product.</h2><p class="mt-5 leading-7 text-slate-600">ACM Austin is run by practitioners who believe the best technical conversations happen in the room, with the context and candour that slides leave out.</p></div><div><div class="flex flex-wrap items-end justify-between gap-4"><h3 class="text-xl font-bold text-navy">Past speakers</h3><a class="font-mono text-xs font-semibold uppercase tracking-wider text-cyan-700 hover:text-navy" href="https://sessionize.com/austin-acm-meetup/" target="_blank" rel="noopener">All accepted speakers ↗</a></div><div id="past-speakers-grid" class="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-4"><div><img class="aspect-square w-full rounded-xl object-cover" src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=400&q=80" alt="Akshay Mittal"><p class="mt-3 font-bold">Akshay Mittal</p><p class="text-xs text-slate-500">AI &amp; civic tech</p></div><div><img class="aspect-square w-full rounded-xl object-cover" src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80" alt="Kavitha Thiyagarajan"><p class="mt-3 font-bold">Kavitha Thiyagarajan</p><p class="text-xs text-slate-500">Data platforms</p></div><div><img class="aspect-square w-full rounded-xl object-cover" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80" alt="Tarun Reddy Nukala"><p class="mt-3 font-bold">Tarun Reddy Nukala</p><p class="text-xs text-slate-500">Cloud engineering</p></div><div><img class="aspect-square w-full rounded-xl object-cover" src="https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=400&q=80" alt="Community speaker"><p class="mt-3 font-bold">You, perhaps?</p><p class="text-xs text-slate-500">Your next talk</p></div></div><button id="show-more-speakers" class="mt-6 rounded-full border border-ink px-5 py-3 text-sm font-bold text-navy hover:border-cyan-600 hover:text-cyan-700" type="button" hidden>See more speakers</button></div></div>
+      <div class="mt-16 border-t border-slate-200 pt-12"><h3 class="text-xl font-bold text-navy">Sponsors who make it possible</h3><div class="mt-6 grid gap-4 sm:grid-cols-3"><div class="rounded-xl border border-slate-200 bg-white p-6"><p class="font-mono text-xs uppercase text-cyan-700">Venue sponsor</p><p class="mt-3 text-2xl font-extrabold text-navy">CGCS</p></div><div class="rounded-xl border border-slate-200 bg-white p-6"><p class="font-mono text-xs uppercase text-cyan-700">Food sponsor</p><p class="mt-3 text-2xl font-extrabold text-navy">Community powered</p></div><div class="rounded-xl border border-slate-200 bg-white p-6"><p class="font-mono text-xs uppercase text-cyan-700">Technology partner</p><p class="mt-3 text-2xl font-extrabold text-navy">ACM / IEEE</p></div></div><div class="mt-12"><div class="flex flex-wrap items-end justify-between gap-4"><h3 class="text-xl font-bold text-navy">Past sponsors</h3><span class="font-mono text-xs uppercase tracking-wider text-slate-500">More coming next release</span></div><div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5"><div class="rounded-xl border border-slate-200 bg-white p-5 font-bold text-navy">Atlassian</div><div class="rounded-xl border border-slate-200 bg-white p-5 font-bold text-navy">MongoDB</div><div class="rounded-xl border border-slate-200 bg-white p-5 font-bold text-navy">Chainguard</div><div class="rounded-xl border border-slate-200 bg-white p-5 font-bold text-navy">CodeRabbit</div><div class="rounded-xl border border-slate-200 bg-white p-5 font-bold text-navy">Technoventions LLC</div></div></div></div>
+    </section>
 
-    <div class="checks">
-      <span class="check"><i>✓</i> Free to attend</span>
-      <span class="check"><i>✓</i> Food and drinks provided</span>
-      <span class="check"><i>✓</i> Students welcome</span>
-      <span class="check"><i>✓</i> No membership required</span>
-    </div>
-  </div>
-</header>
+    <section id="volunteer" class="bg-white px-6 py-20 lg:px-8"><div class="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[.8fr_1.2fr]"><div><p class="font-mono text-xs uppercase tracking-[.2em] text-cyan-600">Make it happen</p><h2 class="mt-3 text-4xl font-extrabold tracking-tight text-navy">Our volunteers</h2><p class="mt-5 leading-7 text-slate-600">A great event is built before the doors open. Help welcome people, share the word, or keep everyone fed.</p><div class="mt-8 flex -space-x-3"><span class="grid h-12 w-12 place-items-center rounded-full border-4 border-white bg-electric font-bold text-navy">AM</span><span class="grid h-12 w-12 place-items-center rounded-full border-4 border-white bg-lime font-bold text-navy">TR</span><span class="grid h-12 w-12 place-items-center rounded-full border-4 border-white bg-slate-300 font-bold text-navy">KT</span><span class="grid h-12 w-12 place-items-center rounded-full border-4 border-white bg-ink font-bold text-white">+8</span></div></div><form id="volunteer-form" class="rounded-2xl border border-slate-200 bg-mist p-6 sm:p-8"><h3 class="text-xl font-bold text-navy">Join the volunteer crew</h3><div class="mt-6 grid gap-5 sm:grid-cols-2"><label class="text-sm font-semibold">Name<input required name="name" autocomplete="name" class="mt-2 w-full rounded-lg border border-slate-300 bg-white px-4 py-3 font-normal outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100" type="text"></label><label class="text-sm font-semibold">Email<input required name="email" autocomplete="email" class="mt-2 w-full rounded-lg border border-slate-300 bg-white px-4 py-3 font-normal outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100" type="email"></label><label class="text-sm font-semibold">Area of interest<select required name="interest" class="mt-2 w-full rounded-lg border border-slate-300 bg-white px-4 py-3 font-normal outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"><option value="">Choose one</option><option>Food</option><option>Check-in</option><option>Marketing</option></select></label><label class="text-sm font-semibold">LinkedIn URL <span class="font-normal text-slate-500">(optional)</span><input name="linkedin" type="url" placeholder="https://linkedin.com/in/..." class="mt-2 w-full rounded-lg border border-slate-300 bg-white px-4 py-3 font-normal outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"></label></div><div class="mt-6 flex flex-wrap items-center gap-4"><button class="rounded-full bg-navy px-6 py-3 text-sm font-bold text-white hover:bg-ink" type="submit">Sign me up</button><p id="form-status" class="text-sm text-slate-600" role="status"></p></div></form></div></section>
 
-<section id="schedule" style="padding-top:30px">
-  <div class="wrap rv">
-    <div class="sec-head">
-      <div>
-        <span class="eyebrow">The schedule</span>
-        <h2>Browse the season</h2>
-        <p class="sec-lede">Thirteen sessions since the chapter started — recaps and what's next, all in one place. Scroll, tap a date, or use Next; the calendar always shows where you are.</p>
-      </div>
-    </div>
+    <section id="about" class="mx-auto max-w-7xl px-6 py-20 lg:px-8"><p class="font-mono text-xs uppercase tracking-[.2em] text-cyan-600">What to expect</p><h2 class="mt-3 text-4xl font-extrabold tracking-tight text-navy">Engineering, without the vendor deck.</h2><div class="mt-10 grid gap-5 md:grid-cols-3"><div class="border-t-4 border-electric pt-5"><h3 class="text-xl font-bold text-navy">Tech talks</h3><p class="mt-3 leading-7 text-slate-600">Three or four focused talks, with questions that go past the slides.</p></div><div class="border-t-4 border-lime pt-5"><h3 class="text-xl font-bold text-navy">Workshops</h3><p class="mt-3 leading-7 text-slate-600">Bring a laptop and leave with a working prototype and new friends.</p></div><div class="border-t-4 border-ink pt-5"><h3 class="text-xl font-bold text-navy">Showcase</h3><p class="mt-3 leading-7 text-slate-600">Members demo what they are building. Your first talk belongs here too.</p></div></div></section>
 
-    <div class="planner">
-      <div class="planner-left" id="plannerLeft">
+    <section id="venue" class="bg-navy px-6 py-20 text-white lg:px-8"><div class="mx-auto grid max-w-7xl gap-10 lg:grid-cols-2 lg:items-center"><div><p class="font-mono text-xs uppercase tracking-[.2em] text-electric">The regular room</p><h2 class="mt-3 text-4xl font-extrabold tracking-tight">The Center for Government and Civic Service</h2><p class="mt-5 leading-7 text-slate-300">1218 West Ave, Building 3000<br>Austin, TX 78701</p><p class="mt-5 font-mono text-sm text-lime">Doors 6:00 PM · Talks 6:30 PM · Wrap 8:30 PM</p><a href="https://maps.app.goo.gl/JPbUrF7urydYrnGPA" target="_blank" rel="noopener" class="mt-8 inline-flex rounded-full border border-slate-500 px-5 py-3 text-sm font-bold hover:border-electric hover:text-electric">Open in Maps ↗</a></div><div class="overflow-hidden rounded-2xl border border-slate-700 bg-white"><iframe title="Map to The Center for Government and Civic Service" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d6891.174368662713!2d-97.75106452310398!3d30.277341307496314!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8644b59c07cefdb5%3A0xc77cc901279ff47c!2sThe%20Center%20for%20Government%20and%20Civic%20Service!5e0!3m2!1sen!2sus!4v1787333681576!5m2!1sen!2sus" width="600" height="450" style="border:0;width:100%;min-height:360px" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe></div></div></section>
+    <section class="bg-white px-6 py-20 lg:px-8"><div class="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[.7fr_1.3fr] lg:items-center"><img class="h-32 w-32 rounded-2xl object-cover object-top" src="photos/Akshay_Mittal_profile.png" alt="Akshay Mittal, ACM Austin chair and organizer"><div><p class="font-mono text-xs uppercase tracking-[.2em] text-cyan-600">Meet the organizer</p><h2 class="mt-3 text-4xl font-extrabold tracking-tight text-navy">Akshay Mittal</h2><p class="mt-4 max-w-2xl leading-7 text-slate-600">Akshay is the chair and organizer behind ACM Austin's monthly meetup, bringing engineers together for practical conversations about AI, data, cloud, security, and the systems they actually ship.</p><div class="mt-6 flex flex-wrap gap-3"><a href="https://akshaymittal143.github.io/portfolio/" target="_blank" rel="noopener" class="rounded-full bg-navy px-5 py-3 text-sm font-bold text-white hover:bg-ink">View portfolio ↗</a><a href="https://www.linkedin.com/in/akshaymittal143/" target="_blank" rel="noopener" class="rounded-full border border-slate-300 px-5 py-3 text-sm font-bold text-navy hover:border-cyan-600 hover:text-cyan-700">Connect on LinkedIn ↗</a></div></div></div></section>
+    <section id="luma-calendar" class="bg-mist px-6 py-20 lg:px-8"><div class="mx-auto max-w-7xl"><div class="flex flex-wrap items-end justify-between gap-6"><div><p class="font-mono text-xs uppercase tracking-[.2em] text-cyan-600">Live calendar</p><h2 class="mt-3 text-4xl font-extrabold tracking-tight text-navy">Find us on Luma</h2><p class="mt-3 max-w-xl text-slate-600">Browse upcoming ACM Austin events and save your spot directly through our Luma calendar.</p></div><a href="https://luma.com/atx-acm" target="_blank" rel="noopener" class="rounded-full bg-navy px-5 py-3 text-sm font-bold text-white hover:bg-ink">Open full calendar ↗</a></div><div class="mt-10 overflow-hidden rounded-2xl border border-slate-300 bg-white shadow-lg"><iframe src="https://luma.com/embed/calendar/cal-HidBA3hMcIwKB1L/events" title="ACM Austin events on Luma" width="600" height="450" frameborder="0" style="border:0;width:100%;min-height:450px" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe></div><p class="mt-3 font-mono text-xs text-slate-500">Luma calendar ID: cal-HidBA3hMcIwKB1L</p></div></section>
+    <section id="volunteer-form-google" class="bg-white px-6 pb-20 lg:px-8"><div class="mx-auto max-w-3xl"><div class="rounded-2xl border border-slate-200 bg-mist p-4 shadow-sm sm:p-6"><div class="mb-5 flex flex-wrap items-end justify-between gap-4"><div><p class="font-mono text-xs uppercase tracking-[.2em] text-cyan-600">Volunteer signup</p><h2 class="mt-2 text-2xl font-extrabold tracking-tight text-navy">Join the volunteer crew</h2></div><a href="https://docs.google.com/forms/d/1f_ucupsckbus_6K4Qd5OI2gOVTxNdLt0rQpzXUctnxI/viewform" target="_blank" rel="noopener" class="text-sm font-bold text-cyan-700 hover:text-navy">Open form ↗</a></div><iframe title="ACM Austin volunteer signup form" src="https://docs.google.com/forms/d/1f_ucupsckbus_6K4Qd5OI2gOVTxNdLt0rQpzXUctnxI/viewform?embedded=true" width="640" height="850" frameborder="0" marginheight="0" marginwidth="0" style="width:100%;min-height:850px;border:0">Loading volunteer form...</iframe></div></div></section>
+    <section id="sponsor" class="bg-white px-6 pb-20 lg:px-8"><div class="mx-auto max-w-7xl rounded-2xl border border-slate-200 bg-mist p-8 sm:p-10"><div class="flex flex-wrap items-center justify-between gap-8"><div><p class="font-mono text-xs uppercase tracking-[.2em] text-cyan-600">Support the community</p><h2 class="mt-3 text-3xl font-extrabold tracking-tight text-navy">Help keep the room open.</h2><p class="mt-4 max-w-2xl leading-7 text-slate-600">ACM Austin is run by volunteers. Sponsorship helps us provide food, support the venue, and keep our technical events free and welcoming to everyone.</p></div><a href="https://docs.google.com/forms/d/e/1FAIpQLSc8HPaboM9NUODwUT-upXe4gyXFqnrG_s37TalQi6HpJ4n2_A/viewform?usp=dialog" target="_blank" rel="noopener" class="rounded-full bg-navy px-6 py-3 text-sm font-bold text-white hover:bg-ink">Sponsor ACM Austin ↗</a></div></div></section>
+  </main>
 
-        <article class="ecard" data-idx="0" data-status="past">
-          <div class="ecard-date"><div class="n">25</div><div class="m">Nov 2025</div></div>
-          <div>
-            <div class="ecard-kind">Recap</div>
-            <h3>Final Meetup of 2025: Year-End Tech Talks &amp; Community Social</h3>
-            <p>A wrap on the chapter's first stretch of sessions — tech talks plus an open social to close out the year.</p>
-            <div class="ecard-foot">
-              <span class="who"><i>AM</i> Akshay Mittal, Ph.D. &amp; Tarun Reddy Nukala · The Center for Government and Civic Service</span>
-              <span class="recap-tag">✓ Recap</span>
-            </div>
-          </div>
-        </article>
+  <footer class="bg-navy px-6 pb-10 text-slate-400 lg:px-8"><div class="mx-auto flex max-w-7xl flex-wrap justify-between gap-5 border-t border-slate-700 pt-8 text-sm"><div class="flex items-start gap-3"><img class="h-8 w-8 rounded-md bg-white object-contain p-1" src="photos/logos/acm.png" alt="ACM Austin logo"><div><span>© 2026 ACM Austin · A joint ACM / IEEE chapter</span><span class="mt-2 block text-xs text-slate-500">Starter project by <a class="hover:text-white" href="https://www.linkedin.com/in/prachi1211/" target="_blank" rel="noopener">Prachi Jethava</a> · Contributors: <a class="hover:text-white" href="https://www.linkedin.com/in/akshaymittal143/" target="_blank" rel="noopener">Akshay Mittal</a>, <a class="hover:text-white" href="https://www.linkedin.com/in/prachi1211/" target="_blank" rel="noopener">Prachi Jethava</a></span></div></div><div class="flex gap-5"><a class="hover:text-white" href="sessionize.html">Speakers</a><a class="hover:text-white" href="https://github.com/acmorg/acm-austin" target="_blank" rel="noopener">GitHub</a><a class="hover:text-white" href="https://www.meetup.com/acm-austin/">Meetup</a><a class="hover:text-white" href="https://www.linkedin.com/company/acm-austin/">LinkedIn</a><a class="hover:text-white" href="https://sessionize.com/austin-acm-meetup/">Speak</a></div></div></footer>
 
-        <article class="ecard" data-idx="1" data-status="past">
-          <div class="ecard-date"><div class="n">29</div><div class="m">Jan 2026</div></div>
-          <div>
-            <div class="ecard-kind">Recap</div>
-            <h3>ACM Austin + IEEE Tech Talks — January Meetup</h3>
-            <p>The first tech talk night of 2026, opening the new year's season of sessions.</p>
-            <div class="ecard-foot">
-              <span class="who"><i>AM</i> Akshay Mittal, Ph.D., Tarun Reddy Nukala &amp; Kavitha Thiyagarajan · The Center for Government and Civic Service</span>
-              <span class="recap-tag">✓ Recap</span>
-            </div>
-          </div>
-        </article>
+  <script>
+    /* Replace these local adapters with server-side calls when API credentials are available. */
+    const EVENTS = [
+      { date: '2026-08-26T18:00:00-05:00', type: 'Tech talks', title: 'August Tech Talks & Community Showcase', description: 'AI platforms, cloud-native systems, security, and what edge computing really costs to operate.', tags: ['Security', 'Edge'], going: 73 },
+      { date: '2026-09-17T18:00:00-05:00', type: 'Workshop', title: 'The A to Z of Building AI Agents with MongoDB', description: 'Build an AI-powered documentation assistant from scratch. Bring a laptop; dinner included.', tags: ['AI Agents', 'MongoDB'], going: 14 },
+      { date: '2026-10-28T18:00:00-05:00', type: 'Tech talks', title: 'October Tech Talks & Community Showcase', description: 'Agent infrastructure, data pipelines, self-optimizing infrastructure, and AI in production.', tags: ['Data', 'Infrastructure'], going: 14 }
+    ];
 
-        <article class="ecard" data-idx="2" data-status="past">
-          <div class="ecard-date"><div class="n">19</div><div class="m">Feb 2026</div></div>
-          <div>
-            <div class="ecard-kind">Recap</div>
-            <h3>Joint Meetup with Kubernetes Austin</h3>
-            <p>A joint session with Kubernetes Austin, hosted off-site at WSO2's North Austin office.</p>
-            <div class="ecard-foot">
-              <span class="who"><i>AM</i> Akshay Mittal, Ph.D. · WSO2 Office, North Austin</span>
-              <span class="recap-tag">✓ Recap</span>
-            </div>
-          </div>
-        </article>
-
-        <article class="ecard" data-idx="3" data-status="past">
-          <div class="ecard-date"><div class="n">23</div><div class="m">Feb 2026</div></div>
-          <div>
-            <div class="ecard-kind">Recap</div>
-            <h3>ACM/IEEE Austin — February Tech Talks</h3>
-            <p>The chapter's regular February tech talk night, back at the usual venue.</p>
-            <div class="ecard-foot">
-              <span class="who"><i>AM</i> Akshay Mittal, Ph.D. · The Center for Government and Civic Service</span>
-              <span class="recap-tag">✓ Recap</span>
-            </div>
-          </div>
-        </article>
-
-        <article class="ecard" data-idx="4" data-status="past">
-          <div class="ecard-date"><div class="n">25</div><div class="m">Mar 2026</div></div>
-          <div>
-            <div class="ecard-kind">Recap</div>
-            <h3>ACM Austin + IEEE March Tech Meetup</h3>
-            <p>March's tech meetup, continuing the chapter's monthly cadence.</p>
-            <div class="ecard-foot">
-              <span class="who"><i>AM</i> Akshay Mittal, Ph.D. · The Center for Government and Civic Service</span>
-              <span class="recap-tag">✓ Recap</span>
-            </div>
-          </div>
-        </article>
-
-        <article class="ecard" data-idx="5" data-status="past">
-          <div class="ecard-date"><div class="n">22</div><div class="m">Apr 2026</div></div>
-          <div>
-            <div class="ecard-kind">Recap</div>
-            <h3>ACM/IEEE Austin: April Tech Talks &amp; Community Showcase</h3>
-            <p>Tech talks and a community showcase, held at West End this month.</p>
-            <div class="ecard-foot">
-              <span class="who"><i>AM</i> Akshay Mittal, Ph.D. · West End</span>
-              <span class="recap-tag">✓ Recap</span>
-            </div>
-          </div>
-        </article>
-
-        <article class="ecard" data-idx="6" data-status="past">
-          <div class="ecard-date"><div class="n">27</div><div class="m">May 2026</div></div>
-          <div>
-            <div class="ecard-kind">Recap</div>
-            <h3>ACM/IEEE Austin: May Tech Talks &amp; Community Showcase</h3>
-            <p>May's tech talks and community showcase, back at West End.</p>
-            <div class="ecard-foot">
-              <span class="who"><i>AM</i> Akshay Mittal, Ph.D. · West End</span>
-              <span class="recap-tag">✓ Recap</span>
-            </div>
-          </div>
-        </article>
-
-        <article class="ecard" data-idx="7" data-status="past">
-          <div class="ecard-date"><div class="n">24</div><div class="m">Jun 2026</div></div>
-          <div>
-            <div class="ecard-kind">Recap</div>
-            <h3>ACM/IEEE Austin's 1st Anniversary Tech Talks &amp; Showcase</h3>
-            <p>The chapter's first anniversary — a milestone tech talks and showcase night.</p>
-            <div class="ecard-foot">
-              <span class="who"><i>AM</i> Akshay Mittal, Ph.D. · The Center for Government and Civic Service</span>
-              <span class="recap-tag">✓ Recap</span>
-            </div>
-          </div>
-        </article>
-
-        <article class="ecard" data-idx="8" data-status="past">
-          <div class="ecard-date"><div class="n">29</div><div class="m">Jul 2026</div></div>
-          <div>
-            <div class="ecard-kind">Recap</div>
-            <h3>ACM/IEEE Austin's July Tech Talks &amp; Showcase</h3>
-            <p>July's tech talks and community showcase at West End.</p>
-            <div class="ecard-foot">
-              <span class="who"><i>AM</i> Akshay Mittal, Ph.D. · West End</span>
-              <span class="recap-tag">✓ Recap</span>
-            </div>
-          </div>
-        </article>
-
-        <article class="ecard" data-idx="9" data-status="past">
-          <div class="ecard-date"><div class="n">3</div><div class="m">Aug 2026</div></div>
-          <div>
-            <div class="ecard-kind">Recap</div>
-            <h3>ACM Austin + IEEE August Tech Meetup: AI, Cloud &amp; Security</h3>
-            <p>A daytime session on AI, cloud, and security — the chapter's most recent past meetup.</p>
-            <div class="ecard-foot">
-              <span class="who"><i>AM</i> Akshay Mittal, Ph.D. · The Center for Government and Civic Service · 11:00 AM</span>
-              <span class="recap-tag">✓ Recap</span>
-            </div>
-          </div>
-        </article>
-
-        <article class="ecard" data-idx="10" data-kind="talk">
-          <div class="ecard-date"><div class="n">26</div><div class="m">Aug 2026</div></div>
-          <div>
-            <div class="ecard-kind">Tech Talks</div>
-            <h3>August Tech Talks &amp; Community Showcase</h3>
-            <p>Four talks on AI platforms, cloud-native systems and security — open-source supply chain security, AI security frameworks, and what edge computing really costs to operate.</p>
-            <div class="ecard-tags"><span class="etag">Security</span><span class="etag">Edge</span><span class="etag">Networking</span></div>
-            <div class="ecard-foot">
-              <span class="who"><i>4</i> 4 speakers · 6:00 PM</span>
-              <div style="display:flex;align-items:center;gap:12px">
-                <span class="going">73 going</span>
-                <a class="btn sm" href="https://www.meetup.com/acm-austin/events/" target="_blank" rel="noopener">RSVP</a>
-              </div>
-            </div>
-          </div>
-        </article>
-
-        <article class="ecard" data-idx="11" data-kind="workshop">
-          <div class="ecard-date"><div class="n">17</div><div class="m">Sep 2026</div></div>
-          <div>
-            <div class="ecard-kind">Workshop</div>
-            <h3>The A to Z of Building AI Agents with MongoDB</h3>
-            <p>Build an AI-powered documentation assistant from scratch with Alejandro Mancilla of MongoDB. Bring a laptop — you'll leave with something running. Dinner included.</p>
-            <div class="ecard-tags"><span class="etag">AI Agents</span><span class="etag">MongoDB</span><span class="etag">Bring a laptop</span></div>
-            <div class="ecard-foot">
-              <span class="who"><i>AM</i> Alejandro Mancilla · MongoDB</span>
-              <div style="display:flex;align-items:center;gap:12px">
-                <span class="going">14 going</span>
-                <a class="btn sm ghost" href="https://www.meetup.com/acm-austin/events/" target="_blank" rel="noopener">RSVP</a>
-              </div>
-            </div>
-          </div>
-        </article>
-
-        <article class="ecard" data-idx="12" data-kind="talk">
-          <div class="ecard-date"><div class="n">28</div><div class="m">Oct 2026</div></div>
-          <div>
-            <div class="ecard-kind">Tech Talks</div>
-            <h3>October Tech Talks &amp; Community Showcase</h3>
-            <p>Agent infrastructure that survives failure, cloud data pipelines at scale, self-optimizing infrastructure, and AI automation running in production.</p>
-            <div class="ecard-tags"><span class="etag">Data</span><span class="etag">Infrastructure</span></div>
-            <div class="ecard-foot">
-              <span class="who"><i>4</i> Speakers announced soon</span>
-              <div style="display:flex;align-items:center;gap:12px">
-                <span class="going">14 going</span>
-                <a class="btn sm ghost" href="https://www.meetup.com/acm-austin/events/" target="_blank" rel="noopener">RSVP</a>
-              </div>
-            </div>
-          </div>
-        </article>
-
-      </div>
-
-      <aside class="planner-cal">
-        <div class="cal-head">
-          <button class="cal-nav" id="calPrev" aria-label="Previous month">‹</button>
-          <div class="cal-title" id="calTitle">August 2026</div>
-          <button class="cal-nav" id="calNext" aria-label="Next month">›</button>
-        </div>
-        <div class="cal-dow"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
-        <div class="cal-grid" id="calGrid"></div>
-        <div class="cal-legend"><i></i> Session scheduled that day</div>
-        <div class="cal-list" id="calList"></div>
-      </aside>
-    </div>
-
-    <div class="planner-controls">
-      <button class="btn ghost sm" id="prevBtn">← Previous</button>
-      <div class="dots" id="progressDots"></div>
-      <button class="btn sm" id="nextBtn">Next month →</button>
-    </div>
-
-    <div class="speak-banner">
-      <p><b>Have a talk in you?</b> ACM Austin is always looking for speakers — tech talks, workshops, and community showcase slots all open.</p>
-      <a class="btn accent sm" href="https://sessionize.com/austin-acm-meetup/" target="_blank" rel="noopener">Submit a proposal ↗</a>
-    </div>
-
-    <div class="runsheet rv">
-      <div class="runsheet-top">
-        <h3>Run of show — the featured session</h3>
-        <span>ACC Rio Grande, Bldg 3000</span>
-      </div>
-      <div class="slot"><time>6:00 PM</time><div><b>Doors, food, and networking</b><span>Grab a plate, find a seat, meet the person next to you.</span></div></div>
-      <div class="slot"><time>6:30 PM</time><div><b>Welcome from the chair</b><span>What the chapter is up to, and who's speaking tonight.</span></div></div>
-      <div class="slot"><time>6:40 PM</time><div><b>Talks or workshop block</b><span>20 minutes per speaker, or hands-on build time for workshops.</span></div></div>
-      <div class="slot"><time>8:00 PM</time><div><b>Open Q&amp;A and community showcase</b><span>Members demo what they're building. Anyone can sign up.</span></div></div>
-      <div class="slot"><time>8:30 PM</time><div><b>Wrap</b><span>Doors close, conversations usually continue outside.</span></div></div>
-    </div>
-  </div>
-</section>
-
-<section id="about">
-  <div class="wrap rv">
-    <span class="eyebrow">What to expect</span>
-    <h2>Engineers explaining work they actually shipped</h2>
-    <p class="sec-lede">ACM Austin is a non-profit chapter of the Association for Computing Machinery, run jointly with IEEE. Architecture, trade-offs, and the thing that broke at 2am — not a vendor deck.</p>
-    <div class="grid3">
-      <div class="card">
-        <span class="badge">Monthly</span>
-        <div class="ico">◎</div>
-        <h3>Tech talks</h3>
-        <p>Three or four speakers a night, 20 minutes each, with questions that go well past the slides.</p>
-      </div>
-      <div class="card">
-        <span class="badge">Occasional</span>
-        <div class="ico">⌘</div>
-        <h3>Workshops</h3>
-        <p>Laptop open, code running before you leave. Small rooms and direct help from the instructor.</p>
-      </div>
-      <div class="card">
-        <span class="badge">Every session</span>
-        <div class="ico">◈</div>
-        <h3>Community showcase</h3>
-        <p>Members demo what they're building. Most of our speakers gave their first talk right here.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section style="padding-top:0">
-  <div class="wrap rv">
-    <div class="host">
-      <div class="avatar">AM</div>
-      <div>
-        <span class="eyebrow" style="margin-bottom:2px">Chapter chair &amp; organizer</span>
-        <h3>Akshay Mittal, PhD</h3>
-        <p>Akshay chairs ACM Austin and curates every session — lining up speakers, keeping the talks technical, and making sure the newest person in the room gets introduced to someone. Want to speak, sponsor, or host a night? He's the one to ask.</p>
-      </div>
-      <div class="host-cta">
-        <a class="btn ghost sm" href="https://www.linkedin.com/in/akshaymittal143/?utm_source=luma" target="_blank" rel="noopener">Connect on LinkedIn</a>
-        <a class="btn sm" href="https://sessionize.com/austin-acm-meetup/" target="_blank" rel="noopener">Propose a talk</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="venue" style="padding-top:0">
-  <div class="wrap rv">
-    <span class="eyebrow">Location</span>
-    <h2>Same room, every month</h2>
-    <p class="sec-lede">Parking on site, doors at 6:00, and there's always food.</p>
-    <div class="venue">
-      <div class="vcard vtxt">
-        <h3>CGCS — ACC Rio Grande Campus</h3>
-        <p class="addr"><b>Building #3000</b><br>1218 West Ave<br>Austin, TX 78701</p>
-        <p class="addr" style="margin-top:22px">Doors &nbsp;6:00 PM<br>Talks &nbsp;6:30 PM<br>Wrap &nbsp;&nbsp;8:30 PM</p>
-        <a class="btn ghost" style="margin-top:14px" href="https://maps.google.com/?q=1218+West+Ave+Austin+TX" target="_blank" rel="noopener">Open in Maps</a>
-      </div>
-      <div class="vcard map"><span>ACC Rio Grande · Bldg 3000</span></div>
-    </div>
-  </div>
-</section>
-
-<section style="padding-top:0">
-  <div class="wrap rv">
-    <div class="join">
-      <span class="eyebrow">Join us</span>
-      <h2>Come to one. Decide after.</h2>
-      <p class="sec-lede">Joining takes a minute and costs nothing. You'll get the schedule, the reminders, and the room.</p>
-      <div class="join-cta">
-        <a class="btn amber" href="https://www.meetup.com/acm-austin/" target="_blank" rel="noopener">Join on Meetup</a>
-        <a class="btn ghost" href="https://sessionize.com/austin-acm-meetup/" target="_blank" rel="noopener">Submit a talk</a>
-        <a class="btn ghost" href="https://www.linkedin.com/company/acm-austin/?utm_source=luma" target="_blank" rel="noopener">Follow on LinkedIn</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<footer>
-  <div class="wrap foot-in">
-    <span>© 2026 ACM Austin — Enterprise AI &amp; Engineering · a joint ACM / IEEE chapter</span>
-    <span class="foot-links">
-      <a href="https://www.meetup.com/acm-austin/" target="_blank" rel="noopener">Meetup</a>
-      <a href="https://www.linkedin.com/company/acm-austin/?utm_source=luma" target="_blank" rel="noopener">LinkedIn</a>
-      <a href="https://sessionize.com/austin-acm-meetup/" target="_blank" rel="noopener">Speak</a>
-      <a href="#top">Back to top</a>
-    </span>
-  </div>
-</footer>
-
-</div>
-
-<div class="dock">
-  <div><b id="dockTitle">Aug 26 · Tech Talks</b><small id="dockMeta">73 going · 6:00 PM</small></div>
-  <a class="btn sm" href="https://www.meetup.com/acm-austin/events/" target="_blank" rel="noopener">RSVP</a>
-</div>
-
-<script>
-/* reveal */
-const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.1});
-document.querySelectorAll('.rv').forEach(el=>io.observe(el));
-
-/* ===================== event data (drives both the clock and the planner) ===================== */
-const EVENTS=[
-  {y:2025,m:10,day:25,status:'past',    title:'Final Meetup of 2025: Year-End Tech Talks & Community Social'},
-  {y:2026,m:0, day:29,status:'past',    title:'ACM Austin + IEEE Tech Talks — January Meetup'},
-  {y:2026,m:1, day:19,status:'past',    title:'Joint Meetup with Kubernetes Austin'},
-  {y:2026,m:1, day:23,status:'past',    title:'ACM/IEEE Austin — February Tech Talks'},
-  {y:2026,m:2, day:25,status:'past',    title:'ACM Austin + IEEE March Tech Meetup'},
-  {y:2026,m:3, day:22,status:'past',    title:'ACM/IEEE Austin: April Tech Talks & Community Showcase'},
-  {y:2026,m:4, day:27,status:'past',    title:'ACM/IEEE Austin: May Tech Talks & Community Showcase'},
-  {y:2026,m:5, day:24,status:'past',    title:"ACM/IEEE Austin's 1st Anniversary Tech Talks & Showcase"},
-  {y:2026,m:6, day:29,status:'past',    title:"ACM/IEEE Austin's July Tech Talks & Showcase"},
-  {y:2026,m:7, day:3, status:'past',    title:'ACM Austin + IEEE August Tech Meetup: AI, Cloud & Security'},
-  {y:2026,m:7, day:26,status:'upcoming',title:'August Tech Talks & Community Showcase', kind:'Tech Talks', going:73, time:'6:00 PM'},
-  {y:2026,m:8, day:17,status:'upcoming',title:'The A to Z of Building AI Agents with MongoDB', kind:'Workshop', going:14, time:'6:00 PM'},
-  {y:2026,m:9, day:28,status:'upcoming',title:'October Tech Talks & Community Showcase', kind:'Tech Talks', going:14, time:'6:00 PM'},
-];
-const MONTH_NAMES=['January','February','March','April','May','June','July','August','September','October','November','December'];
-
-/* split-flap countdown — targets whichever event is next, not a hardcoded date */
-function eventTimestamp(e){ return Date.UTC(e.y,e.m,e.day,23,0,0); } // 6:00 PM CDT = 23:00 UTC
-function nextUpcomingEvent(){
-  const now=Date.now();
-  return EVENTS.find(e=>eventTimestamp(e)>now) || EVENTS[EVENTS.length-1];
-}
-const nextEv=nextUpcomingEvent();
-const nextIdx=EVENTS.indexOf(nextEv);
-const target=eventTimestamp(nextEv);
-document.getElementById('next-label').textContent=
-  new Date(target).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',timeZone:'America/Chicago'})+' · '+nextEv.time;
-
-const flaps=[...document.querySelectorAll('#clock .flap')];
-const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
-function paintClock(){
-  let ms=target-Date.now(); if(ms<0) ms=0;
-  const s=Math.floor(ms/1000);
-  const v=[Math.floor(s/86400),Math.floor(s%86400/3600),Math.floor(s%3600/60),s%60]
-    .map(n=>String(n).padStart(2,'0')).join('');
-  flaps.forEach((f,i)=>{
-    if(f.textContent!==v[i]){
-      f.textContent=v[i];
-      if(!reduceMotion){f.classList.remove('turn');void f.offsetWidth;f.classList.add('turn')}
+    // Meetup API placeholder. Keep the token on a server, never in this file.
+    async function fetchMeetupEvents() {
+      // return fetch('/api/meetup-events').then(response => response.json());
+      return EVENTS;
     }
-  });
-}
-paintClock();setInterval(paintClock,1000);
 
-/* mobile nav menu */
-(()=>{
-  const menuBtn=document.getElementById('menuBtn');
-  const menu=document.getElementById('mobileMenu');
-  function closeMenu(){ menu.hidden=true; menuBtn.setAttribute('aria-expanded','false'); }
-  function openMenu(){ menu.hidden=false; menuBtn.setAttribute('aria-expanded','true'); }
-  menuBtn.addEventListener('click',()=>{ menu.hidden ? openMenu() : closeMenu(); });
-  menu.querySelectorAll('a').forEach(a=>a.addEventListener('click',closeMenu));
-  document.addEventListener('click',(e)=>{
-    if(!menu.hidden && !menu.contains(e.target) && !menuBtn.contains(e.target)) closeMenu();
-  });
-  document.addEventListener('keydown',(e)=>{
-    if(e.key==='Escape' && !menu.hidden){ closeMenu(); menuBtn.focus(); }
-  });
-  matchMedia('(min-width:961px)').addEventListener('change',(e)=>{ if(e.matches) closeMenu(); });
-})();
+    // Luma API placeholder for a future event source migration.
+    async function fetchLumaEvents() {
+      // return fetch('/api/luma-events').then(response => response.json());
+      return [];
+    }
 
-/* ===================== planner: events + calendar ===================== */
+    const SESSIONIZE_ENDPOINT = 'https://sessionize.com/api/v2/f8cooe5l/view/All';
 
-const left=document.getElementById('plannerLeft');
-const cards=[...left.querySelectorAll('.ecard')];
-const calTitle=document.getElementById('calTitle');
-const calGrid=document.getElementById('calGrid');
-const calList=document.getElementById('calList');
-const calPrev=document.getElementById('calPrev');
-const calNext=document.getElementById('calNext');
-const prevBtn=document.getElementById('prevBtn');
-const nextBtn=document.getElementById('nextBtn');
-const dotsWrap=document.getElementById('progressDots');
-const dockTitle=document.getElementById('dockTitle');
-const dockMeta=document.getElementById('dockMeta');
+    // Sessionize supplies the published speaker directory for the community section.
+    async function fetchSessionizeData() {
+      const response = await fetch(SESSIONIZE_ENDPOINT);
+      if (!response.ok) throw new Error(`Sessionize returned ${response.status}`);
+      return response.json();
+    }
 
-let active=nextIdx;
+    const eventGrid = document.querySelector('#event-grid');
+    const formatDate = date => new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'short', day: 'numeric' }).format(new Date(date));
+    function renderEvents(events) {
+      eventGrid.innerHTML = events.map((event, index) => `<article class="group rounded-2xl border ${index === 0 ? 'border-electric shadow-glow' : 'border-slate-200'} bg-white p-6 transition hover:-translate-y-1 hover:shadow-lg"><div class="flex items-center justify-between gap-3"><span class="font-mono text-xs uppercase tracking-wider ${event.type === 'Workshop' ? 'text-emerald-700' : 'text-cyan-700'}">${event.type}</span><span class="text-xs text-slate-500">${event.going} going</span></div><h3 class="mt-5 text-xl font-bold leading-snug text-navy">${event.title}</h3><p class="mt-3 text-sm leading-6 text-slate-600">${event.description}</p><div class="mt-5 flex flex-wrap gap-2">${event.tags.map(tag => `<span class="rounded-full bg-mist px-3 py-1 font-mono text-[11px] text-slate-600">${tag}</span>`).join('')}</div><div class="mt-7 flex items-center justify-between border-t border-slate-100 pt-5"><span class="font-mono text-xs text-slate-500">${formatDate(event.date)} · 6:00 PM</span><a class="font-bold text-cyan-700 hover:text-navy" href="https://www.meetup.com/acm-austin/events/" target="_blank" rel="noopener">RSVP ↗</a></div></article>`).join('');
+    }
 
-/* mark the nearest upcoming session permanently — independent of whichever
-   card is currently scrolled into view */
-if(cards[nextIdx]) cards[nextIdx].classList.add('next-up');
+    const pastSpeakersGrid = document.querySelector('#past-speakers-grid');
+    let showMoreSpeakers = document.querySelector('#show-more-speakers');
+    const escapeSpeakerText = value => String(value || '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[character]));
+    const speakerName = speaker => [speaker.firstName, speaker.lastName].filter(Boolean).join(' ') || speaker.name || 'ACM Austin speaker';
+    function shuffleSpeakers(speakers) {
+      const shuffled = [...speakers];
+      for (let index = shuffled.length - 1; index > 0; index -= 1) {
+        const randomIndex = Math.floor(Math.random() * (index + 1));
+        [shuffled[index], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[index]];
+      }
+      return shuffled;
+    }
+    function renderPastSpeakers(speakers) {
+      if (!speakers.length) return;
+      const randomizedSpeakers = shuffleSpeakers(speakers);
+      pastSpeakersGrid.innerHTML = randomizedSpeakers.map((speaker, index) => `<div class="${index >= 8 ? 'hidden accepted-speaker' : ''}"><img class="aspect-square w-full rounded-xl bg-mist object-cover" src="${escapeSpeakerText(speaker.profilePicture || 'photos/Akshay_Mittal_profile.png')}" alt="${escapeSpeakerText(speakerName(speaker))}"><p class="mt-3 font-bold">${escapeSpeakerText(speakerName(speaker))}</p><p class="text-xs leading-5 text-slate-500">${escapeSpeakerText(speaker.tagLine || speaker.bio || 'ACM Austin speaker')}</p></div>`).join('');
+      if (speakers.length > 8) {
+        if (!showMoreSpeakers) {
+          showMoreSpeakers = document.createElement('button');
+          showMoreSpeakers.id = 'show-more-speakers';
+          showMoreSpeakers.type = 'button';
+          showMoreSpeakers.className = 'mt-6 rounded-full border border-ink px-5 py-3 text-sm font-bold text-navy hover:border-cyan-600 hover:text-cyan-700';
+          showMoreSpeakers.addEventListener('click', () => {
+            document.querySelectorAll('.accepted-speaker').forEach(card => card.classList.remove('hidden'));
+            showMoreSpeakers.hidden = true;
+          });
+          pastSpeakersGrid.after(showMoreSpeakers);
+        }
+        showMoreSpeakers.hidden = false;
+        showMoreSpeakers.textContent = `See all ${speakers.length} speakers`;
+      }
+    }
 
-EVENTS.forEach((_,i)=>{
-  const d=document.createElement('span');d.className='pdot'+(i===nextIdx?' active':'');
-  dotsWrap.appendChild(d);
-});
-const dots=[...dotsWrap.children];
+    // Countdown uses the same event object that renders the first card.
+    function updateCountdown() {
+      const remaining = Math.max(0, new Date(EVENTS[0].date).getTime() - Date.now());
+      const totalSeconds = Math.floor(remaining / 1000);
+      [['days', Math.floor(totalSeconds / 86400)], ['hours', Math.floor(totalSeconds / 3600) % 24], ['minutes', Math.floor(totalSeconds / 60) % 60], ['seconds', totalSeconds % 60]].forEach(([id, value]) => document.querySelector(`#${id}`).textContent = String(value).padStart(2, '0'));
+    }
 
-const dockBtn=document.querySelector('.dock a.btn');
-
-/* a month can hold more than one session (August and February both do) —
-   the grid marks every matching day, not just the one the calendar is
-   currently "on", and each stays independently clickable/jumpable */
-function buildDayGrid(y,m,monthEvents){
-  const first=new Date(y,m,1);
-  const startDow=first.getDay();
-  const daysInMonth=new Date(y,m+1,0).getDate();
-  const daysInPrev=new Date(y,m,0).getDate();
-  const cells=[];
-  for(let i=startDow-1;i>=0;i--) cells.push({d:daysInPrev-i,muted:true});
-  for(let d=1;d<=daysInMonth;d++){
-    const match=monthEvents.find(e=>e.day===d);
-    cells.push({d,muted:false,event:!!match,idx:match?match.idx:null});
-  }
-  while(cells.length%7!==0){ cells.push({d:cells.length,muted:true}); }
-  return cells;
-}
-
-function renderCalendar(i){
-  const ev=EVENTS[i];
-  calTitle.textContent=MONTH_NAMES[ev.m]+' '+ev.y;
-  const monthEvents=EVENTS.map((e,idx)=>({...e,idx})).filter(e=>e.y===ev.y&&e.m===ev.m);
-  const cells=buildDayGrid(ev.y,ev.m,monthEvents);
-  calGrid.innerHTML=cells.map(c=>
-    `<span class="cal-day${c.muted?' muted':''}${c.event?' has-event':''}${c.event&&c.idx===nextIdx?' is-next':''}" ${c.event?'data-idx="'+c.idx+'" tabindex="0" role="button" aria-label="'+(c.idx===nextIdx?'Next session — jump to it':'Jump to session')+'"':''}>${c.d}</span>`
-  ).join('');
-  calGrid.querySelectorAll('.has-event').forEach(el=>{
-    el.addEventListener('click',()=>goTo(Number(el.dataset.idx)));
-    el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();goTo(Number(el.dataset.idx))}});
-  });
-
-  calList.innerHTML=EVENTS.map((e,idx)=>
-    `<button class="cal-item${idx===i?' active':''}${idx===nextIdx?' is-next':''}${e.status==='past'?' is-past':''}" data-idx="${idx}">
-       <b>${MONTH_NAMES[e.m].slice(0,3)} ${e.day}</b><span>${idx===nextIdx?'<i class="next-tag">Next</i> ':''}${e.title}</span>
-     </button>`
-  ).join('');
-  calList.querySelectorAll('.cal-item').forEach(el=>
-    el.addEventListener('click',()=>goTo(Number(el.dataset.idx)))
-  );
-  const activeItem=calList.querySelector('.cal-item.active');
-  if(activeItem) activeItem.scrollIntoView({block:'nearest'});
-
-  calPrev.disabled = i===0;
-  calNext.disabled = i===EVENTS.length-1;
-  prevBtn.disabled = i===0;
-  nextBtn.disabled = i===EVENTS.length-1;
-  nextBtn.textContent = i===EVENTS.length-1 ? 'End of season' : 'Next month →';
-
-  dots.forEach((d,idx)=>d.classList.toggle('active',idx===i));
-  cards.forEach((c,idx)=>c.classList.toggle('active',idx===i));
-
-  const e=EVENTS[i];
-  if(e.status==='past'){
-    dockTitle.textContent=MONTH_NAMES[e.m].slice(0,3)+' '+e.day+' · Recap';
-    dockMeta.textContent='Session complete';
-    if(dockBtn) dockBtn.style.display='none';
-  }else{
-    dockTitle.textContent=MONTH_NAMES[e.m].slice(0,3)+' '+e.day+' · '+e.kind;
-    dockMeta.textContent=e.going+' going · '+e.time;
-    if(dockBtn) dockBtn.style.display='';
-  }
-}
-
-function goTo(i,scroll=true){
-  i=Math.max(0,Math.min(EVENTS.length-1,i));
-  active=i;
-  renderCalendar(i);
-  if(scroll){
-    cards[i].scrollIntoView({block:'start',behavior:reduceMotion?'auto':'smooth'});
-  }
-}
-
-calPrev.addEventListener('click',()=>goTo(active-1));
-calNext.addEventListener('click',()=>goTo(active+1));
-prevBtn.addEventListener('click',()=>goTo(active-1));
-nextBtn.addEventListener('click',()=>goTo(active+1));
-
-/* scroll-linked sync: whichever card's top has passed a line near the panel's
-   top edge drives the calendar (classic scrollspy — robust when cards can be
-   simultaneously >50% visible in a short panel, unlike a ratio threshold). */
-let scrollTick=false;
-function syncFromScroll(){
-  const centerY=left.scrollTop+left.clientHeight/2;
-  let idx=0,best=Infinity;
-  cards.forEach((c,i)=>{
-    const cCenter=c.offsetTop+c.offsetHeight/2;
-    const dist=Math.abs(cCenter-centerY);
-    if(dist<best){ best=dist; idx=i; }
-  });
-  if(idx!==active){ active=idx; renderCalendar(idx); }
-}
-left.addEventListener('scroll',()=>{
-  if(scrollTick) return;
-  scrollTick=true;
-  requestAnimationFrame(()=>{ syncFromScroll(); scrollTick=false; });
-},{passive:true});
-
-renderCalendar(nextIdx);
-if(cards[nextIdx]) cards[nextIdx].scrollIntoView({block:'start',behavior:'instant'});
-</script>
+    document.querySelector('#volunteer-form').addEventListener('submit', event => {
+      event.preventDefault();
+      document.querySelector('#form-status').textContent = 'Thanks. We will be in touch before the next session.';
+      event.target.reset();
+    });
+    fetchMeetupEvents().then(renderEvents);
+    fetchSessionizeData().then(data => renderPastSpeakers(data.speakers || data.speakerList || [])).catch(error => console.warn('Sessionize speaker directory unavailable:', error));
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  </script>
 </body>
 </html>
