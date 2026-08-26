@@ -28,6 +28,8 @@ This checklist tracks the path from local placeholder data to reliable event and
 - [ ] Replace the local `EVENTS` fallback only after the adapter passes fixture tests.
 - [ ] Verify rate limits, timezone handling, cancellations, and sold-out states.
 
+Recommended rollout: keep the static GitHub Pages site as the frontend, add a small serverless API proxy for Meetup, and publish only normalized public event data to the browser. Start with read-only upcoming events and RSVP links; add organizer actions or attendee data only after permissions, consent, and data retention are confirmed.
+
 ## Luma: alternative event source
 
 - [ ] Confirm whether Luma is a source of record or a secondary calendar.
