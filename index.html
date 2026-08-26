@@ -38,15 +38,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    #volunteer-form{display:none}
-    .volunteer-marquee{overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
-    .volunteer-track{display:flex;gap:20px;width:max-content;animation:volunteer-scroll 32s linear infinite}
-    .volunteer-marquee:hover .volunteer-track{animation-play-state:paused}
-    .volunteer-card{flex:0 0 auto}
-    @keyframes volunteer-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-    @media (prefers-reduced-motion: reduce){.volunteer-track{animation:none}}
-  </style>
+  <style>#volunteer-form{display:none}</style>
 </head>
 <body class="bg-mist text-ink font-sans antialiased">
   <header class="bg-navy text-white">
@@ -79,7 +71,7 @@
       <div class="mt-16 border-t border-slate-200 pt-12"><h3 class="text-xl font-bold text-navy">Sponsors who make it possible</h3><div class="mt-6 grid gap-4 sm:grid-cols-3"><div class="rounded-xl border border-slate-200 bg-white p-6"><p class="font-mono text-xs uppercase text-cyan-700">Venue sponsor</p><p class="mt-3 text-2xl font-extrabold text-navy">CGCS</p></div><div class="rounded-xl border border-slate-200 bg-white p-6"><p class="font-mono text-xs uppercase text-cyan-700">Food sponsor</p><p class="mt-3 text-2xl font-extrabold text-navy">Community powered</p></div><div class="rounded-xl border border-slate-200 bg-white p-6"><p class="font-mono text-xs uppercase text-cyan-700">Technology partner</p><p class="mt-3 text-2xl font-extrabold text-navy">ACM / IEEE</p></div></div><div class="mt-12"><div class="flex flex-wrap items-end justify-between gap-4"><h3 class="text-xl font-bold text-navy">Past sponsors</h3><span class="font-mono text-xs uppercase tracking-wider text-slate-500">More coming next release</span></div><div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5"><div class="rounded-xl border border-slate-200 bg-white p-5 font-bold text-navy">Atlassian</div><div class="rounded-xl border border-slate-200 bg-white p-5 font-bold text-navy">MongoDB</div><div class="rounded-xl border border-slate-200 bg-white p-5 font-bold text-navy">Chainguard</div><div class="rounded-xl border border-slate-200 bg-white p-5 font-bold text-navy">CodeRabbit</div><div class="rounded-xl border border-slate-200 bg-white p-5 font-bold text-navy">Technoventions LLC</div></div></div></div>
     </section>
 
-    <section id="volunteer" class="bg-white px-6 py-20 lg:px-8"><div class="mx-auto max-w-7xl"><p class="font-mono text-xs uppercase tracking-[.2em] text-cyan-600">Make it happen</p><h2 class="mt-3 text-4xl font-extrabold tracking-tight text-navy">Our volunteers</h2><p class="mt-5 max-w-2xl leading-7 text-slate-600">A great event is built before the doors open. Meet the crew that welcomes people, shares the word, and keeps everyone fed.</p><div class="volunteer-marquee mt-10"><div id="volunteer-track" class="volunteer-track"></div></div><div class="mt-16 flex flex-wrap items-end justify-between gap-4 rounded-2xl border border-slate-200 bg-mist p-6 sm:p-8"><div><p class="font-mono text-xs uppercase tracking-[.2em] text-cyan-600">Volunteer signup</p><h3 class="mt-2 text-2xl font-extrabold tracking-tight text-navy">Join the volunteer crew</h3></div><a href="https://docs.google.com/forms/d/1f_ucupsckbus_6K4Qd5OI2gOVTxNdLt0rQpzXUctnxI/viewform" target="_blank" rel="noopener" class="rounded-full bg-navy px-6 py-3 text-sm font-bold text-white hover:bg-ink">Open form ↗</a></div></div></section>
+    <section id="volunteer" class="bg-white px-6 py-20 lg:px-8"><div class="mx-auto max-w-7xl"><p class="font-mono text-xs uppercase tracking-[.2em] text-cyan-600">Make it happen</p><h2 class="mt-3 text-4xl font-extrabold tracking-tight text-navy">Our volunteers</h2><p class="mt-5 max-w-2xl leading-7 text-slate-600">A great event is built before the doors open. Meet the crew that welcomes people, shares the word, and keeps everyone fed.</p><div id="volunteer-track" class="mt-10 grid grid-cols-2 gap-5 sm:grid-cols-4"></div><div class="mt-16 flex flex-wrap items-end justify-between gap-4 rounded-2xl border border-slate-200 bg-mist p-6 sm:p-8"><div><p class="font-mono text-xs uppercase tracking-[.2em] text-cyan-600">Volunteer signup</p><h3 class="mt-2 text-2xl font-extrabold tracking-tight text-navy">Join the volunteer crew</h3></div><a href="https://docs.google.com/forms/d/1f_ucupsckbus_6K4Qd5OI2gOVTxNdLt0rQpzXUctnxI/viewform" target="_blank" rel="noopener" class="rounded-full bg-navy px-6 py-3 text-sm font-bold text-white hover:bg-ink">Open form ↗</a></div></div></section>
 
     <section id="about" class="mx-auto max-w-7xl px-6 py-20 lg:px-8"><p class="font-mono text-xs uppercase tracking-[.2em] text-cyan-600">What to expect</p><h2 class="mt-3 text-4xl font-extrabold tracking-tight text-navy">Engineering, without the vendor deck.</h2><div class="mt-10 grid gap-5 md:grid-cols-3"><div class="border-t-4 border-electric pt-5"><h3 class="text-xl font-bold text-navy">Tech talks</h3><p class="mt-3 leading-7 text-slate-600">Three or four focused talks, with questions that go past the slides.</p></div><div class="border-t-4 border-lime pt-5"><h3 class="text-xl font-bold text-navy">Workshops</h3><p class="mt-3 leading-7 text-slate-600">Bring a laptop and leave with a working prototype and new friends.</p></div><div class="border-t-4 border-ink pt-5"><h3 class="text-xl font-bold text-navy">Showcase</h3><p class="mt-3 leading-7 text-slate-600">Members demo what they are building. Your first talk belongs here too.</p></div></div></section>
 
@@ -168,37 +160,23 @@
 
     const VOLUNTEERS = [
       { firstName: 'Shivangi', lastName: 'Singh', linkedin: 'https://www.linkedin.com/in/shivangi-singh66/', photo: 'photos/shivangi-singh.jpg', initials: 'SS', color: 'bg-electric' },
-      { firstName: 'Gayatri', lastName: 'Nakar', linkedin: 'https://www.linkedin.com/in/gayatri-nakar/', photo: 'photos/gayatri-nakar.jpeg', initials: 'GN', color: 'bg-lime' },
-      { firstName: 'Jyothi', lastName: 'Murala', linkedin: 'https://www.linkedin.com/in/jyothi-murala-a97863114?utm_source=share_via&utm_content=profile&utm_medium=member_ios', photo: 'photos/jyothi-murala.jpeg', initials: 'JM', color: 'bg-slate-300', focus: '50% 15%' },
       { firstName: 'Prachi', lastName: 'Jethava', linkedin: 'https://linkedin.com/in/prachijethava/', photo: 'photos/prachi-jethava.jpeg', initials: 'PJ', color: 'bg-rose-300', focus: '50% 15%' }
     ];
 
     const volunteerTrack = document.querySelector('#volunteer-track');
-    function volunteerCard(volunteer, index, hidden) {
+    function volunteerCard(volunteer, index) {
       const name = `${volunteer.firstName} ${volunteer.lastName}`;
-      const fallbackId = `volunteer-fallback-${index}${hidden ? '-dup' : ''}`;
+      const fallbackId = `volunteer-fallback-${index}`;
       const avatar = volunteer.photo
         ? `<div class="relative aspect-square w-full"><img class="absolute inset-0 h-full w-full rounded-xl object-cover" style="object-position:${volunteer.focus || '50% 50%'}" src="${volunteer.photo}" alt="${name}" onerror="this.style.display='none';document.getElementById('${fallbackId}').style.display='flex'"><div id="${fallbackId}" class="absolute inset-0 hidden h-full w-full items-center justify-center rounded-xl ${volunteer.color} text-xl font-bold text-navy">${volunteer.initials}</div></div>`
         : `<div class="grid aspect-square w-full place-items-center rounded-xl ${volunteer.color} text-xl font-bold text-navy">${volunteer.initials}</div>`;
-      return `<div class="volunteer-card rounded-2xl border border-slate-200 bg-white p-4"${hidden ? ' aria-hidden="true"' : ''}>${avatar}<p class="mt-3 font-bold text-navy">${name}</p><a class="mt-2 inline-flex items-center gap-1 text-sm font-bold text-cyan-700 hover:text-navy" href="${volunteer.linkedin}" target="_blank" rel="noopener">LinkedIn ↗</a></div>`;
+      return `<div class="rounded-2xl border border-slate-200 bg-white p-4">${avatar}<p class="mt-3 font-bold text-navy">${name}</p><a class="mt-2 inline-flex items-center gap-1 text-sm font-bold text-cyan-700 hover:text-navy" href="${volunteer.linkedin}" target="_blank" rel="noopener">LinkedIn ↗</a></div>`;
     }
     function renderVolunteers(volunteers) {
       if (!volunteers.length) return;
-      volunteerTrack.innerHTML = volunteers.map((volunteer, index) => volunteerCard(volunteer, index, false)).join('')
-        + volunteers.map((volunteer, index) => volunteerCard(volunteer, index, true)).join('');
-      sizeVolunteerCards();
-    }
-    // Sizes cards so exactly 4 fit across the visible marquee width, at any viewport size.
-    function sizeVolunteerCards() {
-      const marquee = document.querySelector('.volunteer-marquee');
-      if (!marquee) return;
-      const visibleCount = window.innerWidth < 640 ? 2 : 4;
-      const gap = 20;
-      const cardWidth = (marquee.getBoundingClientRect().width - gap * (visibleCount - 1)) / visibleCount;
-      document.querySelectorAll('.volunteer-card').forEach(card => { card.style.width = `${cardWidth}px`; });
+      volunteerTrack.innerHTML = volunteers.map((volunteer, index) => volunteerCard(volunteer, index)).join('');
     }
     renderVolunteers(VOLUNTEERS);
-    window.addEventListener('resize', sizeVolunteerCards);
 
     fetchMeetupEvents().then(renderEvents);
     fetchSessionizeData().then(data => renderPastSpeakers(data.speakers || data.speakerList || [])).catch(error => console.warn('Sessionize speaker directory unavailable:', error));
