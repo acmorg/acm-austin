@@ -151,9 +151,21 @@
       }
     }
 
-    // Countdown uses the same event object that renders the first card.
+    let activeEvents = EVENTS;
+    function getNextEvent(events) {
+      return [...events].filter(event => new Date(event.date).getTime() > Date.now()).sort((first, second) => new Date(first.date) - new Date(second.date))[0] || events[events.length - 1];
+    }
+
+    function updateNextEvent(event) {
+      if (!event) return;
+      document.querySelector('#next-event-name').textContent = event.title;
+      document.querySelector('#next-event-date').textContent = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'America/Chicago', timeZoneName: 'short' }).format(new Date(event.date));
+    }
+
     function updateCountdown() {
-      const remaining = Math.max(0, new Date(EVENTS[0].date).getTime() - Date.now());
+      const nextEvent = getNextEvent(activeEvents);
+      updateNextEvent(nextEvent);
+      const remaining = Math.max(0, new Date(nextEvent.date).getTime() - Date.now());
       const totalSeconds = Math.floor(remaining / 1000);
       [['days', Math.floor(totalSeconds / 86400)], ['hours', Math.floor(totalSeconds / 3600) % 24], ['minutes', Math.floor(totalSeconds / 60) % 60], ['seconds', totalSeconds % 60]].forEach(([id, value]) => document.querySelector(`#${id}`).textContent = String(value).padStart(2, '0'));
     }
@@ -178,7 +190,11 @@
     }
     renderVolunteers(VOLUNTEERS);
 
-    fetchMeetupEvents().then(renderEvents);
+    fetchMeetupEvents().then(events => {
+      activeEvents = events;
+      renderEvents(events);
+      updateCountdown();
+    });
     fetchSessionizeData().then(data => renderPastSpeakers(data.speakers || data.speakerList || [])).catch(error => console.warn('Sessionize speaker directory unavailable:', error));
     updateCountdown();
     setInterval(updateCountdown, 1000);

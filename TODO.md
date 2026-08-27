@@ -30,6 +30,17 @@ This checklist tracks the path from local placeholder data to reliable event and
 
 Recommended rollout: keep the static GitHub Pages site as the frontend, add a small serverless API proxy for Meetup, and publish only normalized public event data to the browser. Start with read-only upcoming events and RSVP links; add organizer actions or attendee data only after permissions, consent, and data retention are confirmed.
 
+## LinkedIn: organization posts feed
+
+- [ ] Create or confirm a LinkedIn Developer app for the ACM Austin organization page.
+- [ ] Request LinkedIn's Community Management API product and organization post read access (typically `r_organization_social`; confirm the current scope in the Developer Portal).
+- [ ] Confirm the authenticated LinkedIn member is an admin of organization `110897461` and authorize the app with the required redirect URL.
+- [ ] Store the OAuth client secret and refreshable access token in the serverless backend, never in `index.html`.
+- [ ] Add `GET /api/linkedin-posts` with pagination, a post limit, response validation, and short-lived caching.
+- [ ] Normalize post text, permalink, published date, media preview, and author into a small public response.
+- [ ] Add a homepage posts section with loading, empty, stale-data, and API-error states plus a link to the LinkedIn company page.
+- [ ] Confirm LinkedIn API terms, rate limits, retention rules, and whether app review is required before production launch.
+
 ## Luma: alternative event source
 
 - [ ] Confirm whether Luma is a source of record or a secondary calendar.
