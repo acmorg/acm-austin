@@ -38,7 +38,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>#volunteer-form{display:none}</style>
+  <style>
+    #volunteer-form{display:none}
+    #next-event-register.luma-checkout--button{margin-top:1.5rem;background:#c8f169;color:#071525}
+    #next-event-register.luma-checkout--button:hover{background:#fff;color:#071525}
+  </style>
 </head>
 <body class="bg-mist text-ink font-sans antialiased">
   <header class="bg-navy text-white">
@@ -54,7 +58,7 @@
       <div class="absolute inset-0 opacity-30" aria-hidden="true" style="background-image:linear-gradient(rgba(45,212,255,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(45,212,255,.12) 1px,transparent 1px);background-size:48px 48px"></div>
       <div class="relative mx-auto grid max-w-7xl gap-12 px-6 lg:grid-cols-[1.2fr_.8fr] lg:items-end lg:px-8">
         <div><p class="mb-6 font-mono text-xs uppercase tracking-[.25em] text-electric">Austin, Texas / ACM + IEEE</p><h1 class="max-w-4xl text-5xl font-extrabold leading-[1.03] tracking-tight sm:text-7xl">Build what’s <span class="text-electric">next.</span><br>Share what works.</h1><p class="mt-7 max-w-2xl text-lg leading-8 text-slate-300">A monthly gathering for engineers working across AI, data, cloud, and security. No vendor theatre. Just useful ideas, honest trade-offs, and people who ship.</p><div class="mt-9 flex flex-wrap gap-3"><a href="#events" class="rounded-full bg-electric px-6 py-3 text-sm font-bold text-navy transition hover:bg-white">See upcoming events</a><a href="https://sessionize.com/austin-acm-meetup/" target="_blank" rel="noopener" class="rounded-full border border-slate-500 px-6 py-3 text-sm font-bold transition hover:border-electric hover:text-electric">Submit a talk ↗</a></div></div>
-        <div class="rounded-2xl border border-slate-700 bg-white/[.06] p-6 shadow-glow backdrop-blur"><p class="font-mono text-xs uppercase tracking-[.2em] text-lime">Next session</p><p id="next-event-name" class="mt-4 text-2xl font-bold">August Tech Talks &amp; Community Showcase</p><p id="next-event-date" class="mt-2 text-sm text-slate-300">Wednesday, August 26 · 6:00 PM</p><div class="mt-7 grid grid-cols-4 gap-2 text-center"><div class="rounded-lg bg-navy/70 p-3"><strong id="days" class="block text-2xl text-electric">00</strong><span class="font-mono text-[10px] uppercase text-slate-400">Days</span></div><div class="rounded-lg bg-navy/70 p-3"><strong id="hours" class="block text-2xl text-electric">00</strong><span class="font-mono text-[10px] uppercase text-slate-400">Hours</span></div><div class="rounded-lg bg-navy/70 p-3"><strong id="minutes" class="block text-2xl text-electric">00</strong><span class="font-mono text-[10px] uppercase text-slate-400">Min</span></div><div class="rounded-lg bg-navy/70 p-3"><strong id="seconds" class="block text-2xl text-electric">00</strong><span class="font-mono text-[10px] uppercase text-slate-400">Sec</span></div></div></div>
+        <div class="rounded-2xl border border-slate-700 bg-white/[.06] p-6 shadow-glow backdrop-blur"><p class="font-mono text-xs uppercase tracking-[.2em] text-lime">Next session</p><p id="next-event-name" class="mt-4 text-2xl font-bold">ACM/IEEE Austin December Tech Talks &amp; Community Showcase</p><p id="next-event-date" class="mt-2 text-sm text-slate-300">Tuesday, December 8 · 6:00 PM CST</p><div class="mt-7 grid grid-cols-4 gap-2 text-center"><div class="rounded-lg bg-navy/70 p-3"><strong id="days" class="block text-2xl text-electric">00</strong><span class="font-mono text-[10px] uppercase text-slate-400">Days</span></div><div class="rounded-lg bg-navy/70 p-3"><strong id="hours" class="block text-2xl text-electric">00</strong><span class="font-mono text-[10px] uppercase text-slate-400">Hours</span></div><div class="rounded-lg bg-navy/70 p-3"><strong id="minutes" class="block text-2xl text-electric">00</strong><span class="font-mono text-[10px] uppercase text-slate-400">Min</span></div><div class="rounded-lg bg-navy/70 p-3"><strong id="seconds" class="block text-2xl text-electric">00</strong><span class="font-mono text-[10px] uppercase text-slate-400">Sec</span></div></div><a id="next-event-register" href="https://luma.com/event/evt-f455gyFgRogsuyw" class="luma-checkout--button mt-6 inline-flex" data-luma-action="checkout" data-luma-event-id="evt-f455gyFgRogsuyw">Register for Event</a></div>
       </div>
     </section>
 
@@ -83,24 +87,19 @@
 
   <footer class="bg-navy px-6 pb-10 text-slate-400 lg:px-8"><div class="mx-auto flex max-w-7xl flex-wrap justify-between gap-5 border-t border-slate-700 pt-8 text-sm"><div class="flex items-start gap-3"><img class="h-8 w-8 rounded-md bg-white object-contain p-1" src="photos/logos/acm.png" alt="ACM Austin logo"><div><span>© 2026 ACM Austin · A joint ACM / IEEE chapter</span><span class="mt-2 block text-xs text-slate-500">Starter project by <a class="hover:text-white" href="https://www.linkedin.com/in/prachi1211/" target="_blank" rel="noopener">Prachi Jethava</a> · Contributors: <a class="hover:text-white" href="https://www.linkedin.com/in/akshaymittal143/" target="_blank" rel="noopener">Akshay Mittal</a>, <a class="hover:text-white" href="https://www.linkedin.com/in/prachi1211/" target="_blank" rel="noopener">Prachi Jethava</a></span></div></div><div class="flex gap-5"><a class="hover:text-white" href="sessionize.html">Speakers</a><a class="hover:text-white" href="https://github.com/acmorg/acm-austin" target="_blank" rel="noopener">GitHub</a><a class="hover:text-white" href="https://www.meetup.com/acm-austin/">Meetup</a><a class="hover:text-white" href="https://www.linkedin.com/company/acm-austin/">LinkedIn</a><a class="hover:text-white" href="https://sessionize.com/austin-acm-meetup/">Speak</a></div></div></footer>
 
+  <script id="luma-checkout" src="https://embed.lu.ma/checkout-button.js"></script>
   <script>
-    /* Replace these local adapters with server-side calls when API credentials are available. */
-    const EVENTS = [
-      { date: '2026-08-26T18:00:00-05:00', type: 'Tech talks', title: 'August Tech Talks & Community Showcase', description: 'AI platforms, cloud-native systems, security, and what edge computing really costs to operate.', tags: ['Security', 'Edge'], going: 73 },
-      { date: '2026-09-17T18:00:00-05:00', type: 'Workshop', title: 'The A to Z of Building AI Agents with MongoDB', description: 'Build an AI-powered documentation assistant from scratch. Bring a laptop; dinner included.', tags: ['AI Agents', 'MongoDB'], going: 14 },
-      { date: '2026-10-28T18:00:00-05:00', type: 'Tech talks', title: 'October Tech Talks & Community Showcase', description: 'Agent infrastructure, data pipelines, self-optimizing infrastructure, and AI in production.', tags: ['Data', 'Infrastructure'], going: 14 }
+    /* Upcoming dates come from events.json, refreshed from the public Luma calendar by .github/workflows/sync-luma.yml. */
+    const FALLBACK_EVENTS = [
+      { date: '2026-12-09T00:00:00.000Z', type: 'Tech talks', title: 'ACM/IEEE Austin December Tech Talks & Community Showcase', description: 'SHI International, 3828 Pecana Trl, Austin', tags: ['AI', 'ML', 'Tech'], going: 3, lumaEventId: 'evt-f455gyFgRogsuyw', url: 'https://luma.com/event/evt-f455gyFgRogsuyw' }
     ];
 
-    // Meetup API placeholder. Keep the token on a server, never in this file.
-    async function fetchMeetupEvents() {
-      // return fetch('/api/meetup-events').then(response => response.json());
-      return EVENTS;
-    }
-
-    // Luma API placeholder for a future event source migration.
     async function fetchLumaEvents() {
-      // return fetch('/api/luma-events').then(response => response.json());
-      return [];
+      const response = await fetch('events.json', { cache: 'no-cache' });
+      if (!response.ok) throw new Error(`events.json returned ${response.status}`);
+      const payload = await response.json();
+      if (!Array.isArray(payload.events) || !payload.events.length) throw new Error('events.json has no events');
+      return payload.events;
     }
 
     const SESSIONIZE_ENDPOINT = 'https://sessionize.com/api/v2/f8cooe5l/view/All';
@@ -113,14 +112,21 @@
     }
 
     const eventGrid = document.querySelector('#event-grid');
-    const formatDate = date => new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'short', day: 'numeric' }).format(new Date(date));
+    const escapeText = value => String(value || '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[character]));
+    const formatDateTime = date => new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'America/Chicago' }).format(new Date(date));
+    const upcomingEvents = events => [...events].filter(event => new Date(event.date).getTime() > Date.now()).sort((first, second) => new Date(first.date) - new Date(second.date));
     function renderEvents(events) {
-      eventGrid.innerHTML = events.map((event, index) => `<article class="group rounded-2xl border ${index === 0 ? 'border-electric shadow-glow' : 'border-slate-200'} bg-white p-6 transition hover:-translate-y-1 hover:shadow-lg"><div class="flex items-center justify-between gap-3"><span class="font-mono text-xs uppercase tracking-wider ${event.type === 'Workshop' ? 'text-emerald-700' : 'text-cyan-700'}">${event.type}</span><span class="text-xs text-slate-500">${event.going} going</span></div><h3 class="mt-5 text-xl font-bold leading-snug text-navy">${event.title}</h3><p class="mt-3 text-sm leading-6 text-slate-600">${event.description}</p><div class="mt-5 flex flex-wrap gap-2">${event.tags.map(tag => `<span class="rounded-full bg-mist px-3 py-1 font-mono text-[11px] text-slate-600">${tag}</span>`).join('')}</div><div class="mt-7 flex items-center justify-between border-t border-slate-100 pt-5"><span class="font-mono text-xs text-slate-500">${formatDate(event.date)} · 6:00 PM</span><a class="font-bold text-cyan-700 hover:text-navy" href="https://www.meetup.com/acm-austin/events/" target="_blank" rel="noopener">RSVP ↗</a></div></article>`).join('');
+      const upcoming = upcomingEvents(events);
+      if (!upcoming.length) {
+        eventGrid.innerHTML = '<p class="text-slate-600">The next session is not on the calendar yet. Check Luma for updates.</p>';
+        return;
+      }
+      eventGrid.innerHTML = upcoming.map((event, index) => `<article class="group rounded-2xl border ${index === 0 ? 'border-electric shadow-glow' : 'border-slate-200'} bg-white p-6 transition hover:-translate-y-1 hover:shadow-lg"><div class="flex items-center justify-between gap-3"><span class="font-mono text-xs uppercase tracking-wider ${event.type === 'Workshop' ? 'text-emerald-700' : 'text-cyan-700'}">${escapeText(event.type)}</span><span class="text-xs text-slate-500">${Number(event.going) || 0} registered</span></div><h3 class="mt-5 text-xl font-bold leading-snug text-navy">${escapeText(event.title)}</h3><p class="mt-3 text-sm leading-6 text-slate-600">${escapeText(event.description)}</p><div class="mt-5 flex flex-wrap gap-2">${(event.tags || []).map(tag => `<span class="rounded-full bg-mist px-3 py-1 font-mono text-[11px] text-slate-600">${escapeText(tag)}</span>`).join('')}</div><div class="mt-7 flex items-center justify-between border-t border-slate-100 pt-5"><span class="font-mono text-xs text-slate-500">${formatDateTime(event.date)}</span><a class="luma-checkout--button font-bold text-cyan-700 hover:text-navy" href="${escapeText(event.url)}" data-luma-action="checkout" data-luma-event-id="${escapeText(event.lumaEventId)}">Register for Event</a></div></article>`).join('');
     }
 
     const pastSpeakersGrid = document.querySelector('#past-speakers-grid');
     let showMoreSpeakers = document.querySelector('#show-more-speakers');
-    const escapeSpeakerText = value => String(value || '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[character]));
+    const escapeSpeakerText = escapeText;
     const speakerName = speaker => [speaker.firstName, speaker.lastName].filter(Boolean).join(' ') || speaker.name || 'ACM Austin speaker';
     function shuffleSpeakers(speakers) {
       const shuffled = [...speakers];
@@ -151,21 +157,32 @@
       }
     }
 
-    let activeEvents = EVENTS;
+    let activeEvents = FALLBACK_EVENTS;
     function getNextEvent(events) {
-      return [...events].filter(event => new Date(event.date).getTime() > Date.now()).sort((first, second) => new Date(first.date) - new Date(second.date))[0] || events[events.length - 1];
+      return upcomingEvents(events)[0] || null;
     }
 
     function updateNextEvent(event) {
-      if (!event) return;
-      document.querySelector('#next-event-name').textContent = event.title;
-      document.querySelector('#next-event-date').textContent = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'America/Chicago', timeZoneName: 'short' }).format(new Date(event.date));
+      const name = document.querySelector('#next-event-name');
+      const date = document.querySelector('#next-event-date');
+      const register = document.querySelector('#next-event-register');
+      if (!event) {
+        name.textContent = 'Schedule coming soon';
+        date.textContent = 'The next date will appear here once it is on Luma.';
+        register.hidden = true;
+        return;
+      }
+      name.textContent = event.title;
+      date.textContent = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'America/Chicago', timeZoneName: 'short' }).format(new Date(event.date));
+      register.hidden = false;
+      register.href = event.url;
+      register.dataset.lumaEventId = event.lumaEventId;
     }
 
     function updateCountdown() {
       const nextEvent = getNextEvent(activeEvents);
       updateNextEvent(nextEvent);
-      const remaining = Math.max(0, new Date(nextEvent.date).getTime() - Date.now());
+      const remaining = nextEvent ? Math.max(0, new Date(nextEvent.date).getTime() - Date.now()) : 0;
       const totalSeconds = Math.floor(remaining / 1000);
       [['days', Math.floor(totalSeconds / 86400)], ['hours', Math.floor(totalSeconds / 3600) % 24], ['minutes', Math.floor(totalSeconds / 60) % 60], ['seconds', totalSeconds % 60]].forEach(([id, value]) => document.querySelector(`#${id}`).textContent = String(value).padStart(2, '0'));
     }
@@ -190,10 +207,21 @@
     }
     renderVolunteers(VOLUNTEERS);
 
-    fetchMeetupEvents().then(events => {
+    function bindLumaCheckout() {
+      if (window.luma && typeof window.luma.initCheckout === 'function') window.luma.initCheckout();
+    }
+
+    fetchLumaEvents().then(events => {
       activeEvents = events;
       renderEvents(events);
       updateCountdown();
+      bindLumaCheckout();
+    }).catch(error => {
+      console.warn('Using the saved next session because events.json is unavailable:', error);
+      activeEvents = FALLBACK_EVENTS;
+      renderEvents(activeEvents);
+      updateCountdown();
+      bindLumaCheckout();
     });
     fetchSessionizeData().then(data => renderPastSpeakers(data.speakers || data.speakerList || [])).catch(error => console.warn('Sessionize speaker directory unavailable:', error));
     updateCountdown();
