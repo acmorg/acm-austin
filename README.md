@@ -56,7 +56,9 @@ git push origin main
 
 ## Current Integrations
 
-The page links to the chapter's Meetup, LinkedIn, Sessionize, and venue map pages. The JavaScript includes API-ready adapters named `fetchMeetupEvents`, `fetchLumaEvents`, and `fetchSessionizeData`. They currently return local placeholder data; API credentials should be handled by a server-side proxy rather than committed to the browser.
+The page links to the chapter's Meetup, LinkedIn, Sessionize, and venue map pages. The JavaScript includes API-ready adapters named `fetchMeetupEvents`, `fetchLumaEvents`, and `fetchSessionizeData`. Meetup API credentials must be handled server-side rather than committed to the browser.
+
+The Meetup member count is displayed from `meetup-members.json`. The scheduled `.github/workflows/sync-meetup-members.yml` workflow refreshes it weekly using Meetup GraphQL and deploys the updated static site. Add a valid `MEETUP_ACCESS_TOKEN` secret to the `github-pages` GitHub Actions environment to enable automatic API updates. The checked-in starting count, 2,117, was verified against the public Meetup group page on November 19, 2026.
 
 ## Volunteer Form Storage
 

@@ -1,0 +1,62 @@
+name: Sync Meetup member count
+
+on:
+  schedule:
+    - cron: "47 13 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    env:
+      MEETUP_ACCESS_TOKEN: ${{ secrets.MEETUP_ACCESS_TOKEN }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Refresh meetup-members.json
+        if: env.MEETUP_ACCESS_TOKEN != ''
+        run: python3 scripts/sync_meetup_members.py
+
+      - name: Skip when Meetup API token is missing
+        if: env.MEETUP_ACCESS_TOKEN == ''
+        run: echo "Set MEETUP_ACCESS_TOKEN in the github-pages environment to enable API updates."
+
+      - name: Commit member-count changes
+        id: commit
+        run: |
+          git add meetup-members.json
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "Update Meetup member count"
+            git push
+          fi
+
+      - name: Configure GitHub Pages
+        if: steps.commit.outputs.changed == 'true'
+        uses: actions/configure-pages@v5
+
+      - name: Upload site artifact
+        if: steps.commit.outputs.changed == 'true'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        if: steps.commit.outputs.changed == 'true'
+        uses: actions/deploy-pages@v4
